@@ -19,10 +19,10 @@ $smarty = new MySmarty();
 $opt = $smarty->opt();
 
 if (isset($_POST["action"]) && $_POST["action"] == "signup") {
-	$username = isset($_REQUEST["username"]) ? $_POST["username"] : "";
-	$fullname = isset($_REQUEST["fullname"]) ? $_POST["fullname"] : "";
-	$email = isset($_REQUEST["email"]) ? $_POST["email"] : "";
-	$familyid = isset($_REQUEST["familyid"]) ? $_POST["familyid"] : $opt['newuser_default_family'];
+	$username = $_POST["username"];
+	$fullname = $_POST["fullname"];
+	$email = $_POST["email"];
+	$familyid = $_POST["familyid"];
 		
 	// make sure that username isn't taken.
 	$stmt = $smarty->dbh()->prepare("SELECT userid FROM {$opt["table_prefix"]}users WHERE username = ?");
@@ -100,9 +100,6 @@ while ($row = $stmt->fetch()) {
 if (count($families) == 1) {
 	// default the family to the single family we have.
 	$familyid = $families[0]["familyid"];
-}
-if (isset($opt['newuser_default_family']) && $opt['newuser_default_family'] != 0) {
-	$familyid = $opt['newuser_default_family'];
 }
 $smarty->assign('families', $families);
 $smarty->assign('username', $username);

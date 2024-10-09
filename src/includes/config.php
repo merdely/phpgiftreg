@@ -39,12 +39,6 @@ function getGlobalOptions() {
 		*/
 		"newuser_requires_approval" => 1,
 
-		/* Do not allow new user to choose family
-			0 = allow new user to choose family
-			1 or more = default family
-		*/
-		"newuser_default_family" => 1,
-
 		/* Whether or not whom an item is reserved/bought by is hidden. */
 		"anonymous_purchasing" => 0,
 
