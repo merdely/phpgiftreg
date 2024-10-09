@@ -24,7 +24,7 @@ CREATE TABLE `categories` (
 -- Dumping data for table `categories`
 --
 
-INSERT INTO `categories` VALUES (1,'Books');
+INSERT INTO `categories` VALUES (1,'Miscellaneous');
 INSERT INTO `categories` VALUES (2,'Music');
 INSERT INTO `categories` VALUES (3,'Video Games');
 INSERT INTO `categories` VALUES (4,'Clothing');
@@ -36,10 +36,11 @@ INSERT INTO `categories` VALUES (9,'Electronics');
 INSERT INTO `categories` VALUES (10,'Ornaments/Figurines');
 INSERT INTO `categories` VALUES (11,'Automotive');
 INSERT INTO `categories` VALUES (12,'Toys');
-INSERT INTO `categories` VALUES (13,'Jewellery');
+INSERT INTO `categories` VALUES (13,'Jewelry');
 INSERT INTO `categories` VALUES (14,'Computer');
 INSERT INTO `categories` VALUES (15,'Games');
 INSERT INTO `categories` VALUES (16,'Tools');
+INSERT INTO `categories` VALUES (17,'Books');
 
 --
 -- Table structure for table `events`
@@ -67,12 +68,13 @@ INSERT INTO `events` VALUES (1,NULL,'Christmas','2000-12-25',1);
 CREATE TABLE `items` (
   `itemid` int(11) NOT NULL auto_increment,
   `userid` int(11) NOT NULL default '0',
-  `description` varchar(255) NOT NULL default '',
+  `name` varchar(100) NOT NULL default '',
+  `description` varchar(255) default '',
   `price` decimal(7,2) default NULL,
   `source` varchar(255) NOT NULL default '',
   `ranking` int(11) NOT NULL default '0',
   `url` varchar(255) default NULL,
-  `category` int(11) default NULL,
+  `category` int(11) default '1',
   `comment` text,
   `quantity` int(11) NOT NULL default '0',
   `image_filename` varchar(255) default NULL,
@@ -150,6 +152,7 @@ CREATE TABLE `users` (
   `admin` tinyint(1) NOT NULL default '0',
   `comment` text,
   `email_msgs` tinyint(1) NOT NULL default '0',
+  `show_helptext` tinyint(1) NOT NULL default '1',
   `list_stamp` datetime default NULL,
   `initialfamilyid` int NULL,
   PRIMARY KEY  (`userid`)
