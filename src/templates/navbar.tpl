@@ -22,7 +22,8 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 			</a>
-			<a class="brand" href="index.php">Gift Registry</a>
+			<a class="brand" href="index.php">
+                        <img src="images/wishlist.png" height=25px width=25px /> Gift Registry</a>
 			<div id="main-menu" class="nav-collapse">
 				<ul id="main-menu-left" class="nav">
 					<li><a href="shoplist.php">My Shopping List</a></li>

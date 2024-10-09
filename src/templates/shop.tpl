@@ -87,8 +87,8 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 		<table class="table table-bordered table-striped">
 			<thead>
 			<tr>
-				<th><a href="shop.php?shopfor={$shopfor}&sort=ranking">Rank</a></th>
 				<th><a href="shop.php?shopfor={$shopfor}&sort=description">Description</a></th>
+				<th><a href="shop.php?shopfor={$shopfor}&sort=ranking">Rank</a></th>
 				<th><a href="shop.php?shopfor={$shopfor}&sort=category">Category</a></th>
 				<th><a href="shop.php?shopfor={$shopfor}&sort=price">Price</a></th>
 				<th><a href="shop.php?shopfor={$shopfor}&sort=source">Store/Location</a></th>
@@ -99,19 +99,22 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 			<tbody>
 			{foreach from=$shoprows item=row}
 				<tr valign="top">
-					<td nowrap>{$row.rendered}</td>
 					<td>
+						{if $row.url != ''}
+							<a href="{$row.url}" target="_blank">
+						{/if}
 						{$row.description|escape:'htmlall'}
+						{if $row.url != ''}
+							</a>
+						{/if}
 						{if $row.comment != ''}
 							<a class="btn btn-small" rel="popover" href="#" data-placement="right" data-original-title="Comment" data-content="{$row.comment|escape:'htmlall'}">...</a>
-						{/if}
-						{if $row.url != ''}
-							<a href="{$row.url}" target="_blank"><img src="images/link.png" border="0" alt="URL" title="URL"></a>
 						{/if}
 						{if $row.image_filename != '' && $opt.allow_images}
 							<a rel="lightbox" href="{$opt.image_subdir}/{$row.image_filename}" title="{$row.description|escape:'htmlall'}"><img src="images/image.png" border="0" alt="Image" /></a>
 						{/if}
 					</td>
+					<td nowrap>{$row.rendered}</td>
 					<td>{$row.category|default:"&nbsp;"}</td>
 					<td align="right">{$row.price}</td>
 					<td>{$row.source|escape:'htmlall'}</td>

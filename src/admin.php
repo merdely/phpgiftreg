@@ -41,7 +41,7 @@ if ($action == "approve") {
 		$stmt->execute();
 	}
 	$stmt = $smarty->dbh()->prepare("UPDATE {$opt["table_prefix"]}users SET approved = 1, password = {$opt["password_hasher"]}(?) WHERE userid = ?");
-	$stmt->bindParam(1, $pwd, PDO::PARAM_INT);
+	$stmt->bindParam(1, $pwd, PDO::PARAM_STR);
 	$stmt->bindValue(2, (int) $_GET["userid"], PDO::PARAM_INT);
 	$stmt->execute();
 	
@@ -54,7 +54,9 @@ if ($action == "approve") {
 			$row["email"],
 			"Gift Registry application approved",
 			"Your Gift Registry application was approved by " . $_SESSION["fullname"] . ".\r\n" . 
-				"Your username is " . $row["username"] . " and your password is $pwd.",
+				"Your username is " . $row["username"] . " and your password is '$pwd'.\r\n" .
+                                "Log in to https://wishlist.erdelynet.com/ and change your password under\r\n" .
+                                "Update Profile as soon as possible.",
 			"From: {$opt["email_from"]}\r\nReply-To: {$opt["email_reply_to"]}\r\nX-Mailer: {$opt["email_xmailer"]}\r\n"
 		) or die("Mail not accepted for " . $row["email"]);	
 	}

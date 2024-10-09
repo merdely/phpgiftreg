@@ -18,11 +18,11 @@ function getGlobalOptions() {
 		/* The PDO connection string.
 			http://www.php.net/manual/en/pdo.connections.php
 		*/
-		"pdo_connection_string" => "mysql:host=localhost;dbname=giftreg",
+		"pdo_connection_string" => "mysql:host=127.0.0.1;dbname=phpgiftreg",
 
 		/* The database username and password. */
-		"pdo_username" => "giftreg",
-		"pdo_password" => "cn3Malk",
+		"pdo_username" => "phpgiftreg",
+		"pdo_password" => "Disquietingly195.prosubstitution",
 
 		/* The maximum number of days before an event which produces a notification. */
 		"event_threshold" => "60",
@@ -31,7 +31,7 @@ function getGlobalOptions() {
 			0 = auto-approve,
 			1 = require approval
 		*/
-		"shop_requires_approval" => 1,
+		"shop_requires_approval" => 0,
 
 		/* Whether or not requesting a new account is immediately approved.
 			0 = auto-approve,
@@ -46,10 +46,10 @@ function getGlobalOptions() {
 		"items_per_page" => 10,
 
 		/* The e-mail From: header. */
-		"email_from" => "webmaster@" . $_SERVER['SERVER_NAME'],
+		"email_from" => "wishlist@erdelynet.com",
 
 		/* The e-mail Reply-To: header. */
-		"email_reply_to" => "rwalberg@mts.net",
+		"email_reply_to" => "mike@erdelynet.com",
 
 		/* The e-mail X-Mailer header. */
 		"email_xmailer" => "PHP/" . phpversion(),
@@ -59,14 +59,14 @@ function getGlobalOptions() {
 			0 = don't help text,
 			1 = show help text
 		*/
-		"show_helptext" => 0,
+		"show_helptext" => 1,
 
 		/* Whether or not clicking the Delete Item link requires a JavaScript-based
 			confirmation.
 			0 = don't show confirmation,
 			1 = show confirmation
 		*/
-		"confirm_item_deletes" => 0,
+		"confirm_item_deletes" => 1,
 
 		/* Whether or not to allow multiple quantities of an item. */
 		"allow_multiples" => 1,
@@ -113,7 +113,7 @@ function getGlobalOptions() {
 				UPDATE users SET password = MD5(password)
 			on your database to convert the passwords.  This operation is NON-REVERSIBLE!
 		*/
-		"password_hasher" => "MD5",
+		"password_hasher" => "SHA1",
 
 		/* Whether or not to allow image uploads.  If on, the next option must point to
 			a valid subdirectory that is writeable by the web server.  The setup.php

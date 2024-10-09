@@ -80,7 +80,9 @@ if (isset($_POST["action"]) && $_POST["action"] == "signup") {
 					$email,
 					"Gift Registry account created",
 					"Your Gift Registry account was created.\r\n" . 
-						"Your username is $username and your password is $pwd.",
+						"Your username is $username and your password is '$pwd'.\r\n" .
+                                                "Log in to https://wishlist.erdelynet.com/ and change your password under\r\n" .
+                                                "Update Profile as soon as possible.",
 					"From: {$opt["email_from"]}\r\nReply-To: {$opt["email_reply_to"]}\r\nX-Mailer: {$opt["email_xmailer"]}\r\n"
 				) or die("Mail not accepted for $email");	
 			}
