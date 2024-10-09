@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
 	<link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 	<script src="bootstrap/js/bootstrap.min.js"></script>
 	<link href="lightbox/css/jquery.lightbox-0.5.css" rel="stylesheet">
 	<script src="lightbox/js/jquery.lightbox-0.5.min.js"></script>
@@ -54,6 +54,11 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 			{/if}
 		});
 	</script>
+	<!-- these css files are what was customized from stock -->
+	<!--
+	<link href="css/phpgiftrec.min.css" rel="stylesheet">
+	<link href="css/phpgiftrec-responsive.css" rel="stylesheet">
+	-->
 </head>
 <body>
 	{include file='navbar.tpl'}
