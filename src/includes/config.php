@@ -14,15 +14,31 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 function getGlobalOptions() {
+	// Read information
+	$mysql_conn_string = "mysql:host=localhost;dbname=giftreg";
+	$mysql_username = "giftreg";
+	$mysql_password = "cn3Malk";
+	if (file_exists('/conf/phpgiftreg.conf')) {
+		$ini_file = parse_ini_file('/conf/phpgiftreg.conf');
+		if (isset($ini_file['mysql_conn_string'])) {
+			$mysql_conn_string = $ini_file['mysql_conn_string'];
+		}
+		if (isset($ini_file['mysql_username'])) {
+			$mysql_username = $ini_file['mysql_username'];
+		}
+		if (isset($ini_file['mysql_password'])) {
+			$mysql_password = $ini_file['mysql_password'];
+		}
+	}
 	return array(
 		/* The PDO connection string.
 			http://www.php.net/manual/en/pdo.connections.php
 		*/
-		"pdo_connection_string" => "mysql:host=127.0.0.1;dbname=phpgiftreg",
+		"pdo_connection_string" => $mysql_conn_string,
 
 		/* The database username and password. */
-		"pdo_username" => "phpgiftreg",
-		"pdo_password" => "Disquietingly195.prosubstitution",
+		"pdo_username" => $mysql_username,
+		"pdo_password" => $mysql_password,
 
 		/* The maximum number of days before an event which produces a notification. */
 		"event_threshold" => "60",
