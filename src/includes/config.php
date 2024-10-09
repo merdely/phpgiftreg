@@ -15,11 +15,12 @@
 
 function getGlobalOptions() {
 	// Read information
+	$conf_file = '/var/www/conf/phpgiftreg.conf';
 	$mysql_conn_string = "mysql:host=localhost;dbname=giftreg";
 	$mysql_username = "giftreg";
 	$mysql_password = "cn3Malk";
-	if (file_exists('/var/www/conf/phpgiftreg.conf')) {
-		$ini_file = parse_ini_file('/var/www/conf/phpgiftreg.conf');
+	if (file_exists($conf_file)) {
+		$ini_file = parse_ini_file($conf_file);
 		if (isset($ini_file['mysql_conn_string'])) {
 			$mysql_conn_string = $ini_file['mysql_conn_string'];
 		}
