@@ -128,7 +128,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 									<input id="email" name="email" type="text" class="input-xlarge" value="{$email|escape:'htmlall'}" placeholder="you@somewhere.com">
 								</div>
 							</div>
-							{if $familycount > 1}
+							{if $familycount > 1 && $opt.newuser_default_family == 0}
 								<div class="control-group">
 									<label class="control-label" for="familyid">Family</label>
 									<div class="controls">
