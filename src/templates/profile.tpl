@@ -140,6 +140,13 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 			</div>
 		</div>
 		<div class="control-group">
+			<label class="control-label" for="show_helptext">Show help text</label>
+			<div class="controls">
+				<input type="checkbox" id="show_helptext" name="show_helptext" {if $show_helptext}CHECKED{/if}>
+				Show help messages on pages
+			</div>
+		</div>
+		<div class="control-group">
 			<label class="control-label" for="comment">Comments / shipping address / etc. (optional)</label>
 			<div class="controls">
 				<textarea id="comment" name="comment" rows="5" cols="40">{$comment|escape:'htmlall'}</textarea>

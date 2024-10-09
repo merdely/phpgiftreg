@@ -27,6 +27,8 @@ else {
 	$userid = $_SESSION["userid"];
 }
 
+$opt['show_helptext'] = $_SESSION['show_helptext'];
+
 $action = "";
 if (!empty($_GET["action"])) {
 	$action = $_GET["action"];
@@ -55,10 +57,11 @@ if (!empty($_GET["action"])) {
 		$query = "INSERT INTO items(userid,description,price,source,url,category) SELECT $userid, description, price, source, url, category FROM items WHERE itemid = " . $_GET["itemid"];
 		*/
 		/* TODO: copy the image too? */
-		$stmt = $smarty->dbh()->prepare("SELECT userid, description, price, source, url, category, comment FROM {$opt["table_prefix"]}items WHERE itemid = ?");
+		$stmt = $smarty->dbh()->prepare("SELECT userid, name, description, price, source, url, category, comment FROM {$opt["table_prefix"]}items WHERE itemid = ?");
 		$stmt->bindParam(1, $itemid, PDO::PARAM_INT);
 		$stmt->execute();
 		if ($row = $stmt->fetch()) {
+			$name = $row["name"];
 			$desc = $row["description"];
 			$source = $row["source"];
 			$url = $row["url"];
@@ -66,19 +69,20 @@ if (!empty($_GET["action"])) {
 			$price = (float) $row["price"];
 			$cat = (int) $row["category"];
 		
-			$stmt = $smarty->dbh()->prepare("INSERT INTO {$opt["table_prefix"]}items(userid,description,price,source,url,comment,category,ranking,quantity) VALUES(?, ?, ?, ?, ?, ?, ?, 1, 1)");
+			$stmt = $smarty->dbh()->prepare("INSERT INTO {$opt["table_prefix"]}items(userid,name,description,price,source,url,comment,category,ranking,quantity) VALUES(?, ?, ?, ?, ?, ?, ?, 1, 1)");
 			$stmt->bindParam(1, $userid, PDO::PARAM_INT);
-			$stmt->bindParam(2, $desc, PDO::PARAM_STR);
-			$stmt->bindParam(3, $price);
-			$stmt->bindParam(4, $source, PDO::PARAM_STR);
-			$stmt->bindParam(5, $url, PDO::PARAM_STR);
-			$stmt->bindParam(6, $comment, PDO::PARAM_STR);
-			$stmt->bindParam(7, $cat, PDO::PARAM_INT);
+			$stmt->bindParam(2, $name, PDO::PARAM_STR);
+			$stmt->bindParam(3, $desc, PDO::PARAM_STR);
+			$stmt->bindParam(4, $price);
+			$stmt->bindParam(5, $source, PDO::PARAM_STR);
+			$stmt->bindParam(6, $url, PDO::PARAM_STR);
+			$stmt->bindParam(7, $comment, PDO::PARAM_STR);
+			$stmt->bindParam(8, $cat, PDO::PARAM_INT);
 			$stmt->execute();
 		
 			stampUser($userid, $smarty->dbh(), $smarty->opt());
 
-			$message = "Added '" . $desc . "' to your gift list.";
+			$message = "Added '" . $name . "' to your gift list.";
 		}
 	}
 }
@@ -98,34 +102,34 @@ if (!($stmt->fetch())) {
 }
 
 if (!isset($_GET["sort"])) {
-	$sortby = "rankorder DESC, description";
+	$sortby = "rankorder DESC, name";
 }
 else {
 	$sort = $_GET["sort"];
 	switch ($sort) {
 		case "ranking":
-			$sortby = "rankorder DESC, description";
+			$sortby = "rankorder DESC, name";
 			break;
-		case "description":
-			$sortby = "description";
+		case "name":
+			$sortby = "name";
 			break;
 		case "source":
-			$sortby = "source, rankorder DESC, description";
+			$sortby = "source, rankorder DESC, name";
 			break;
 		case "price":
-			$sortby = "price, rankorder DESC, description";
+			$sortby = "price, rankorder DESC, name";
 			break;
 		case "url":
-			$sortby = "url, rankorder DESC, description";
+			$sortby = "url, rankorder DESC, name";
 			break;
 		case "status":
-			$sortby = "reservedid DESC, boughtid DESC, rankorder DESC, description";
+			$sortby = "reservedid DESC, boughtid DESC, rankorder DESC, name";
 			break;
 		case "category":
-			$sortby = "c.category, rankorder DESC, description";
+			$sortby = "c.category, rankorder DESC, name";
 			break;
 		default:
-			$sortby = "rankorder DESC, description";
+			$sortby = "rankorder DESC, name";
 	}
 }
 
@@ -133,7 +137,7 @@ else {
 	for those items with a quantity of 1.  if the item's quantity > 1 we'll query alloc when we
 	get to that record.  the theory is that most items will have quantity = 1 so we'll make the least
 	number of trips. */
-$stmt = $smarty->dbh()->prepare("SELECT i.itemid, description, price, source, c.category, url, image_filename, " .
+$stmt = $smarty->dbh()->prepare("SELECT i.itemid, name, description, price, source, c.category, url, image_filename, " .
 		"ub.fullname AS bfullname, ub.userid AS boughtid, " .
 		"ur.fullname AS rfullname, ur.userid AS reservedid, " .
 		"rendered, i.comment, i.quantity " .

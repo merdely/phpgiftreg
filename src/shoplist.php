@@ -27,6 +27,8 @@ else {
 	$userid = $_SESSION["userid"];
 }
 
+$opt['show_helptext'] = $_SESSION['show_helptext'];
+
 if (empty($_GET["sort"]))
 	$sort = "source";
 else

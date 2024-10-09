@@ -36,8 +36,11 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 				highlight: validate_highlight,
 				success: validate_success,
 				rules: {
-					description: {
+					name: {
 						required: true,
+						maxlength: 100
+					},
+					description: {
 						maxlength: 255
 					},
 					category: {
@@ -49,7 +52,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 						"number": true
 					},
 					source: {
-						required: true,
 						maxlength: 255
 					},
 					ranking: {
@@ -65,8 +67,11 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 					}
 				},
 				messages: {
+					name: {
+						required: "The item's name is required.",
+						maxlength: "The item's name must be 100 characters or less."
+					},
 					description: {
-						required: "The item's description is required.",
 						maxlength: "The item's description must be 255 characters or less."
 					},
 					category: {
@@ -78,7 +83,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 						"number": "Price must be a valid number."
 					},
 					source: {
-						required: "A source to buy the item is required.",
 						maxlength: "The source must be 255 characters or less."
 					},
 					ranking: {
@@ -130,10 +134,19 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 					{elseif $action == "add" || (isset($haserror) && $action == 'insert')}
 						<input type="hidden" name="action" value="insert">
 					{/if}
+					<div class="control-group {if isset($name_error)}warning{/if}">
+						<label class="control-label" for="name">Name</label>
+						<div class="controls">
+							<input id="name" name="name" type="text" value="{$name|escape:'htmlall'}" class="input-xlarge" placeholder="Name" maxlength="100">
+							{if isset($name_error)}
+								<span class="help-inline">{$name_error}</span>
+							{/if}
+						</div>
+					</div>
 					<div class="control-group {if isset($description_error)}warning{/if}">
 						<label class="control-label" for="description">Description</label>
 						<div class="controls">
-							<input id="description" name="description" type="text" value="{$description|escape:'htmlall'}" class="input-xlarge" placeholder="Description" maxlength="255">
+							<textarea id="description" name="description" class="input-xlarge" rows="2" cols="40">{$description|escape:'htmlall'}</textarea>
 							{if isset($description_error)}
 								<span class="help-inline">{$description_error}</span>
 							{/if}
@@ -143,7 +156,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 						<label class="control-label" for="category">Category</label>
 						<div class="controls">
 							<select id="category" name="category" class="input-xlarge">
-								<option value="">Uncategorized</option>
 								{foreach from=$categories item=row}
 									<option value="{$row.categoryid}" {if $row.categoryid == $category}SELECTED{/if}>{$row.category|escape:'htmlall'}</option>
 								{/foreach}

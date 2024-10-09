@@ -87,13 +87,13 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 		<table class="table table-bordered table-striped">
 			<thead>
 			<tr>
-				<th><a href="shop.php?shopfor={$shopfor}&sort=description">Description</a></th>
+				<th><a href="shop.php?shopfor={$shopfor}&sort=name">Name</a></th>
 				<th><a href="shop.php?shopfor={$shopfor}&sort=ranking">Rank</a></th>
 				<th><a href="shop.php?shopfor={$shopfor}&sort=category">Category</a></th>
 				<th><a href="shop.php?shopfor={$shopfor}&sort=price">Price</a></th>
 				<th><a href="shop.php?shopfor={$shopfor}&sort=source">Store/Location</a></th>
 				<th><a href="shop.php?shopfor={$shopfor}&sort=status">Status</a></th>
-				<th>&nbsp;</th>
+				<th>Actions</th>
 			</tr>
 			</thead>
 			<tbody>
@@ -103,7 +103,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 						{if $row.url != ''}
 							<a href="{$row.url}" target="_blank">
 						{/if}
-						{$row.description|escape:'htmlall'}
+						<span title="{$row.description|escape:'htmlall'}">{$row.name|escape:'htmlall'}</span>
 						{if $row.url != ''}
 							</a>
 						{/if}
@@ -114,7 +114,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 							<a rel="lightbox" href="{$opt.image_subdir}/{$row.image_filename}" title="{$row.description|escape:'htmlall'}"><img src="images/image.png" border="0" alt="Image" /></a>
 						{/if}
 					</td>
-					<td nowrap>{$row.rendered}</td>
+					<td nowrap>{$row.rendered}&nbsp;&nbsp;&nbsp;</td>
 					<td>{$row.category|default:"&nbsp;"}</td>
 					<td align="right">{$row.price}</td>
 					<td>{$row.source|escape:'htmlall'}</td>

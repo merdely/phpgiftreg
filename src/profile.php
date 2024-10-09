@@ -54,18 +54,21 @@ if (!empty($_POST["action"])) {
 		$email = $_POST["email"];
 		$comment = $_POST["comment"];
 		$email_msgs = ($_POST["email_msgs"] == "on" ? 1 : 0);
+		$show_helptext = ($_POST["show_helptext"] == "on" ? 1 : 0);
 
 		try {
-			$stmt = $smarty->dbh()->prepare("UPDATE {$opt["table_prefix"]}users SET fullname = ?, email = ?, email_msgs = ?, comment = ? WHERE userid = ?");
+			$stmt = $smarty->dbh()->prepare("UPDATE {$opt["table_prefix"]}users SET fullname = ?, email = ?, email_msgs = ?, show_helptext = ?, comment = ? WHERE userid = ?");
 			$stmt->bindParam(1, $fullname, PDO::PARAM_STR);
 			$stmt->bindParam(2, $email, PDO::PARAM_STR);
 			$stmt->bindParam(3, $email_msgs, PDO::PARAM_BOOL);
-			$stmt->bindParam(4, $comment, PDO::PARAM_STR);
-			$stmt->bindParam(5, $userid, PDO::PARAM_INT);
+			$stmt->bindParam(4, $show_helptext, PDO::PARAM_BOOL);
+			$stmt->bindParam(5, $comment, PDO::PARAM_STR);
+			$stmt->bindParam(6, $userid, PDO::PARAM_INT);
 		
 			$stmt->execute();
 
 			$_SESSION["fullname"] = $fullname;
+			$_SESSION['show_helptext'] = $show_helptext;
 
 			header("Location: " . getFullPath("index.php?message=Profile+updated."));
 			exit;
@@ -80,7 +83,7 @@ if (!empty($_POST["action"])) {
 }
 
 try {
-	$stmt = $smarty->dbh()->prepare("SELECT fullname, email, email_msgs, comment FROM {$opt["table_prefix"]}users WHERE userid = ?");
+	$stmt = $smarty->dbh()->prepare("SELECT fullname, email, email_msgs, show_helptext, comment FROM {$opt["table_prefix"]}users WHERE userid = ?");
 	$stmt->bindParam(1, $userid, PDO::PARAM_INT);
 
 	$stmt->execute();
@@ -88,6 +91,8 @@ try {
 		$smarty->assign('fullname', $row["fullname"]);
 		$smarty->assign('email', $row["email"]);
 		$smarty->assign('email_msgs', $row["email_msgs"]);
+		$smarty->assign('show_helptext', $row["show_helptext"]);
+		$_SESSION['show_helptext'] = $row["show_helptext"];
 		$smarty->assign('comment', $row["comment"]);
 		$smarty->display('profile.tpl');
 	}

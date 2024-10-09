@@ -90,26 +90,27 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 		<table class="table table-bordered table-striped">
 			<thead>
 				<tr>
-					<th class="colheader"><a href="index.php?mysort=description">Description</a></th>
+					<th class="colheader"><a href="index.php?mysort=name">Name</a></th>
 					<th class="colheader"><a href="index.php?mysort=ranking">Ranking</a></th>
 					<th class="colheader"><a href="index.php?mysort=category">Category</a></th>
-					<th class="rcolheader"><a href="index.php?mysort=price">Price</a></th>
-					<th>&nbsp;</th>
+					<th class="colheader"><a href="index.php?mysort=price">Price</a></th>
+					<th class="rcolheader">Actions</th>
 				</tr>
 			</thead>
 			<tbody>
 				{foreach from=$myitems item=row}
 					<tr valign="top">
 						<td>
-							{$row.description|escape:'htmlall'}
+							<span title="{$row.description|escape:'htmlall'}">
+							<a href="item.php?action=edit&itemid={$row.itemid}">{$row.name|escape:'htmlall'}</a></span>
 							 {if $row.comment != ''}
-								<a class="btn btn-small" rel="popover" href="#" data-placement="right" data-original-title="Comment" data-content="{$row.comment|escape:'htmlall'}">...</a>
+								&nbsp;<a class="btn btn-small" rel="popover" href="#" data-placement="right" data-original-title="Comment" data-content="{$row.comment|escape:'htmlall'}">...</a>
 							{/if}
 							{if $row.url != ''}
-								<a href="{$row.url|escape:'htmlall'}" target="_blank"><img src="images/link.png" border="0" alt="URL" title="URL"></a>
+								&nbsp;<a rel="lightbox" href="{$row.url}" title="{$row.url}"><img src="images/link.png" border="0" alt="Image" /></a>
 							{/if}
 							{if $row.image_filename != '' && $opt.allow_images}
-								<a rel="lightbox" href="{$opt.image_subdir}/{$row.image_filename}" title="{$row.description|escape:'htmlall'}"><img src="images/image.png" border="0" alt="Image" /></a>
+								&nbsp;<a rel="lightbox" href="{$opt.image_subdir}/{$row.image_filename}" title="{$row.name|escape:'htmlall'}"><img src="images/image.png" border="0" alt="Image" /></a>
 							{/if}
 						</td>
 						<td nowrap>{$row.rendered}</td>
@@ -118,7 +119,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 						<td align="right" nowrap>
 							<a href="receive.php?itemid={$row.itemid}"><img alt="Mark Item Received" src="images/return.png" border="0" title="Mark Item Received" /></a>&nbsp;
 							<a href="item.php?action=edit&itemid={$row.itemid}"><img alt="Edit Item" src="images/pencil.png" border="0" title="Edit Item" /></a>&nbsp;
-							<a rel="confirmitemdelete" data-content="{$row.description|escape:'htmlall'}" href="item.php?action=delete&itemid={$row.itemid}"><img alt="Delete Item" src="images/bin.png" border="0" alt="Delete" title="Delete Item" /></a>
+							<a rel="confirmitemdelete" data-content="{$row.name|escape:'htmlall'}" href="item.php?action=delete&itemid={$row.itemid}"><img alt="Delete Item" src="images/bin.png" border="0" alt="Delete" title="Delete Item" /></a>
 						</td>
 					</tr>
 				{/foreach}

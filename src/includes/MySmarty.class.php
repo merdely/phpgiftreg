@@ -19,11 +19,12 @@ class MySmarty extends Smarty {
 			$opt["pdo_password"]);
 	}
 
-	public function opt() {
+	public function opt($session = NULL) {
 		static $opt;
 		if (!isset($opt)) {
 			$opt = getGlobalOptions();
 		}
+		$opt['show_helptext'] = isset($_SESSION['show_helptext']) ? $_SESSION['show_helptext'] : $opt['show_helptext'];
 		return $opt;
 	}
 

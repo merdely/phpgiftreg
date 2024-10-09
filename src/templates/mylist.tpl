@@ -56,7 +56,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 							<tr>
 								<th><a href="mylist.php?sort=ranking">Ranking</a></th>
 								<th><a href="mylist.php?sort=source">Source</a></th>
-								<th><a href="mylist.php?sort=description">Description</a></th>
+								<th><a href="mylist.php?sort=name">Name</a></th>
 								<th><a href="mylist.php?sort=category">Category</a></th>
 								<th><a href="mylist.php?sort=price">Price</a></th>
 							</tr>
@@ -66,7 +66,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 								<tr>
 									<td>{$row.rendered}</td>
 									<td>{$row.source|escape:'htmlall'}</td>
-									<td>{$row.description|escape:'htmlall'}</td>
+									<td>{$row.name|escape:'htmlall'}</td>
 									<td>{$row.category|escape:'htmlall'}</td>
 									<td>{$row.price}</td>
 								</tr>

@@ -30,7 +30,7 @@ if (!empty($_POST["username"])) {
 	$password = $_POST["password"];
 
 	try {
-		$stmt = $smarty->dbh()->prepare("SELECT userid, fullname, admin FROM {$opt["table_prefix"]}users WHERE username = ? AND password = {$opt["password_hasher"]}(?) AND approved = 1");
+		$stmt = $smarty->dbh()->prepare("SELECT userid, fullname, admin, show_helptext FROM {$opt["table_prefix"]}users WHERE username = ? AND password = {$opt["password_hasher"]}(?) AND approved = 1");
 		$stmt->bindParam(1, $username, PDO::PARAM_STR);
 		$stmt->bindParam(2, $password, PDO::PARAM_STR);
 
@@ -40,6 +40,8 @@ if (!empty($_POST["username"])) {
 			$_SESSION["userid"] = $row["userid"];
 			$_SESSION["fullname"] = $row["fullname"];
 			$_SESSION["admin"] = $row["admin"];
+			$_SESSION["show_helptext"] = $row["show_helptext"];
+			$opt['show_helptext'] = $row["show_helptext"];
 		
 			header("Location: " . getFullPath("index.php"));
 			exit;

@@ -113,28 +113,28 @@ if (!empty($_GET["mysort"]))
 	$_SESSION["mysort"] = $_GET["mysort"];
 	
 if (!isset($_SESSION["mysort"])) {
-	$sortby = "rankorder DESC, i.description";
+	$sortby = "rankorder DESC, i.name";
 	$_SESSION["mysort"] = "ranking";
 }
 else {
 	switch ($_SESSION["mysort"]) {
 		case "ranking":
-			$sortby = "rankorder DESC, i.description";
+			$sortby = "rankorder DESC, i.name";
 			break;
-		case "description":
-			$sortby = "i.description";
+		case "name":
+			$sortby = "i.name";
 			break;
 		case "price":
-			$sortby = "price, rankorder DESC, i.description";
+			$sortby = "price, rankorder DESC, i.name";
 			break;
 		case "category":
-			$sortby = "c.category, rankorder DESC, i.description";
+			$sortby = "c.category, rankorder DESC, i.name";
 			break;
 		default:
-			$sortby = "rankorder DESC, i.description";
+			$sortby = "rankorder DESC, i.name";
 	}
 }
-$stmt = $smarty->dbh()->prepare("SELECT itemid, description, c.category, price, url, rendered, comment, image_filename FROM {$opt["table_prefix"]}items i LEFT OUTER JOIN {$opt["table_prefix"]}categories c ON c.categoryid = i.category LEFT OUTER JOIN {$opt["table_prefix"]}ranks r ON r.ranking = i.ranking WHERE userid = ? ORDER BY " . $sortby);
+$stmt = $smarty->dbh()->prepare("SELECT itemid, name, description, c.category, price, url, rendered, comment, image_filename FROM {$opt["table_prefix"]}items i LEFT OUTER JOIN {$opt["table_prefix"]}categories c ON c.categoryid = i.category LEFT OUTER JOIN {$opt["table_prefix"]}ranks r ON r.ranking = i.ranking WHERE userid = ? ORDER BY " . $sortby);
 $stmt->bindParam(1, $userid, PDO::PARAM_INT);
 $stmt->execute();
 $myitems_count = 0;
