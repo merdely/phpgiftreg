@@ -18,6 +18,10 @@ require_once(dirname(__FILE__) . "/includes/MySmarty.class.php");
 $smarty = new MySmarty();
 $opt = $smarty->opt();
 
+if (!isset($username)) $username = "";
+if (!isset($fullname)) $fullname = "";
+if (!isset($email)) $email = "";
+
 if (isset($_POST["action"]) && $_POST["action"] == "signup") {
 	$username = isset($_REQUEST["username"]) ? $_POST["username"] : "";
 	$fullname = isset($_REQUEST["fullname"]) ? $_POST["fullname"] : "";
@@ -110,7 +114,9 @@ $smarty->assign('fullname', $fullname);
 $smarty->assign('email', $email);
 $smarty->assign('familyid', $familyid);
 $smarty->assign('familycount', count($families));
-$smarty->assign('action', $_POST["action"]);
+if (isset($_POST["action"])) {
+	$smarty->assign('action', $_POST["action"]);
+}
 if (isset($error)) {
 	$smarty->assign('error', $error);
 }

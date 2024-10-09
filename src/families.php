@@ -38,6 +38,8 @@ $action = empty($_GET["action"]) ? "" : $_GET["action"];
 
 if (!empty($_GET["familyid"]))
 	$familyid = (int) $_GET["familyid"];
+else
+	$familyid = 1;
 
 if ($action == "insert" || $action == "update") {
 	/* validate the data. */
@@ -177,7 +179,7 @@ try {
 		$smarty->assign('familyname_error', $familyname_error);
 	}
 	$smarty->assign('families', $families);
-	$smarty->assign('familyid',	$familyid);
+	$smarty->assign('familyid', $familyid);
 	$smarty->assign('familyname', $familyname);
 	if (isset($nonmembers)) {
 		$smarty->assign('nonmembers', $nonmembers);
