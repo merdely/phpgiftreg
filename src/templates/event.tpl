@@ -20,8 +20,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 	<title>Test Gift Registry - Manage Events</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-	<script src="bootstrap/js/bootstrap.min.js"></script>
+	<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 	<link href="datepicker/css/datepicker.css" rel="stylesheet">
 	<script src="datepicker/js/bootstrap-datepicker.js"></script>
 	<script src="js/jquery.validate.min.js"></script>
@@ -177,5 +176,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 		</div>
 	</div>
 </div>
+	<script src="bootstrap/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

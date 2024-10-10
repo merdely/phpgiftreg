@@ -21,7 +21,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
 	<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-	<script src="bootstrap/js/bootstrap.min.js"></script>
 	<link href="lightbox/css/lightbox.css" rel="stylesheet">
 
     <script language="JavaScript" type="text/javascript">
@@ -215,5 +214,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 	</div>
 	</div>
 	<script src="lightbox/js/lightbox.min.js"></script>
+	<script src="bootstrap/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

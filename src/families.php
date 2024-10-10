@@ -19,6 +19,7 @@ $smarty = new MySmarty();
 $opt = $smarty->opt();
 
 session_start();
+$haserror = false;
 if (!isset($_SESSION["userid"])) {
 	header("Location: " . getFullPath("login.php"));
 	exit;
