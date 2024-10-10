@@ -94,7 +94,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 							{/foreach}
 						</tbody>
 					</table>
-					<h5><a href="categories.php#catform">Add a new category</a></h5>
 				</div>
 			</div>
 		</div>

@@ -27,6 +27,18 @@ else {
 	$userid = $_SESSION["userid"];
 }
 
+# set default variables
+$name = "";
+$description = "";
+$price = 0.00;
+$source = "";
+$url = "";
+$category = 1;
+$ranking = 3;
+$comment = "";
+$quantity = 1;
+$image_filename = "";
+
 // for security, let's make sure that if an itemid was passed in, it belongs
 // to $userid.  all operations on this page should only be performed by
 // the item's owner.
