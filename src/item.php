@@ -106,6 +106,8 @@ if (!empty($_REQUEST["action"])) {
                     error_log("MWE: image_filename: $image_filename");
 					// move the PHP temporary file to that filename.
 					rename($temp_image, $image_filename);
+					// fix permissions on the new file
+					chmod($image_filename, 0644);
 					// the name we're going to record in the DB is the filename without the path.
 					$image_base_filename = basename($image_filename);
                     error_log("MWE: image_base_filename: $image_base_filename");
@@ -166,6 +168,8 @@ if (!empty($_REQUEST["action"])) {
 			$image_filename = $temp_name . "." . $uploaded_file_ext;
 			// move the PHP temporary file to that filename.
 			move_uploaded_file($_FILES["imagefile"]["tmp_name"],$image_filename);
+			// fix permissions on the new file
+			chmod($image_filename, 0644);
 			// the name we're going to record in the DB is the filename without the path.
 			$image_base_filename = basename($image_filename);
 		}
