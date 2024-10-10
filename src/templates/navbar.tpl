@@ -17,16 +17,16 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 Inspired from https://getbootstrap.com/docs/4.0/components/navbar/#supported-content
 *}
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
   <div class="container">
     <a class="navbar-brand" href="index.php"><img src="images/wishlist.png" height=25px width=25px /> Test Gift Registry</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav">
-        <li class="nav-item active">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
           <a class="nav-link" href="shoplist.php">My Shopping List</a>
         </li>
         <li class="nav-item">
@@ -38,13 +38,13 @@ Inspired from https://getbootstrap.com/docs/4.0/components/navbar/#supported-con
       </ul>
     </div>
     <div class="collapse navbar-collapse" id="navbarSupportedContent1">
-      <ul class="navbar-nav ms-auto">
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
         {if $isadmin}
-        <li class="nav-item dropdown" data-bs-theme="dark">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarAdminDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarAdminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             Admin
           </a>
-          <div class="dropdown-menu" aria-labelledby="navbarAdminDropdown">
+          <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarAdminDropdown">
             <a class="dropdown-item" href="users.php">Manage Users</a>
             <a class="dropdown-item" href="families.php">Manage Families</a>
             <a class="dropdown-item" href="categories.php">Manage Categories</a>
@@ -52,8 +52,8 @@ Inspired from https://getbootstrap.com/docs/4.0/components/navbar/#supported-con
           </div>
         </li>
         {/if}
-        <li class="nav-item dropdown" data-bs-theme="dark">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             <img src="images/userprofile.png" height=25px width=25px />
           </a>
           <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
