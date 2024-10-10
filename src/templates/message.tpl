@@ -19,7 +19,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 <head>
 	<title>Test Gift Registry - Compose a Message</title>
 	<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
-	<link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
 </head>
 <body>
 	{include file='navbar.tpl' isadmin=$isadmin}

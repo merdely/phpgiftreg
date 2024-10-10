@@ -20,21 +20,12 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 	<title>Test Gift Registry - Home Page for {$fullname|escape:'htmlall'}</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
-	<link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
 	<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 	<script src="bootstrap/js/bootstrap.min.js"></script>
-	<link href="lightbox/css/jquery.lightbox-0.5.css" rel="stylesheet">
-	<script src="lightbox/js/jquery.lightbox-0.5.min.js"></script>
+	<link href="lightbox/css/lightbox.css" rel="stylesheet">
 	
 	<script language="JavaScript" type="text/javascript">
 		$(document).ready(function() {
-			$('a[rel=lightbox]').lightBox({
-				imageLoading: 'lightbox/images/lightbox-ico-loading.gif',
-				imageBtnClose: 'lightbox/images/lightbox-btn-close.gif',
-				imageBtnPrev: 'lightbox/images/lightbox-btn-prev.gif',
-				imageBtnNext: 'lightbox/images/lightbox-btn-next.gif',
-				imageBlank: 'lightbox/images/lightbox-blank.gif'
-			});
 			$('a[rel=popover]').removeAttr('href').popover();
 			{if $opt.confirm_item_deletes}
 				$('a[rel=confirmitemdelete]').click(function(event) {
@@ -112,10 +103,10 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 								&nbsp;<a class="btn btn-small" rel="popover" href="#" data-placement="right" data-original-title="Comment" data-content="{$row.comment|escape:'htmlall'}">...</a>
 							{/if}
 							{if $row.url != ''}
-								&nbsp;<a rel="lightbox" href="{$row.url}" title="{$row.url}"><img src="images/link.png" border="0" alt="Image" /></a>
+								&nbsp;<a href="{$row.url}" title="{$row.url}"><img src="images/link.png" border="0" alt="Image" /></a>
 							{/if}
 							{if $row.image_filename != '' && $opt.allow_images}
-								&nbsp;<a rel="lightbox" href="{$opt.image_subdir}/{$row.image_filename}" title="{$row.name|escape:'htmlall'}"><img src="images/image.png" border="0" alt="Image" /></a>
+								&nbsp;<a href="{$opt.image_subdir}/{$row.image_filename}" title="{$row.name|escape:'htmlall'}" data-lightbox="image-1"><img src="images/image.png" border="0" alt="Image" /></a>
 							{/if}
 						</td>
 						<td nowrap>{$row.rendered}</td>
@@ -353,5 +344,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 			{/if}
 		</section>
 	</div>
+	<script src="lightbox/js/lightbox.min.js"></script>
 </body>
 </html>
