@@ -15,21 +15,19 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 *}
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 <head>
 	<title>Test Gift Registry - Manage Events</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
-	<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-	<link href="datepicker/css/datepicker.css" rel="stylesheet">
-	<script src="datepicker/js/bootstrap-datepicker.js"></script>
-	<script src="js/jquery.validate.min.js"></script>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+	<script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js" crossorigin="anonymous"></script>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap-datepicker/dist/css/bootstrap-datepicker3.min.css" rel="stylesheet" crossorigin="anonymous">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/jquery-validation/dist/jquery.validate.min.js" crossorigin="anonymous"></script>
 	<script src="js/giftreg.js"></script>
 
 	<script language="JavaScript" type="text/javascript">
 		$(document).ready(function() {
-			$('#eventdate').datepicker();
-
 			$('#eventform').validate({
 				highlight: validate_highlight,
 				success: validate_success,
@@ -135,7 +133,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 					<div class="control-group {if isset($description_error)}warning{/if}">
 						<label class="control-label" for="description">Description</label>
 						<div class="controls">
-							<input id="description" name="description" type="text" value="{$description|escape:'htmlall'}" class="input-xlarge" maxlength="255" placeholder="Description">
+							<input id="description" name="description" type="text" value="{$description|escape:'htmlall'}" class="input-xlarge " maxlength="255" placeholder="Description">
 							{if isset($description_error)}
 								<span class="help-inline">{$description_error}</span>
 							{/if}
@@ -144,7 +142,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 					<div class="control-group {if isset($eventdate_error)}warning{/if}">
 						<label class="control-label" for="eventdate">Event date</label>
 						<div class="controls">
-							<input id="eventdate" name="eventdate" type="text" value="{$eventdate|escape:'htmlall'}" class="input-xlarge" placeholder="mm/dd/yyyy" data-date-format="mm/dd/yyyy">
+							<input id="eventdate" name="eventdate" type="text" value="{$eventdate|escape:'htmlall'}" class="input-xlarge" placeholder="mm/dd/yyyy" data-date-format="mm/dd/yyyy" data-provide="datepicker">
 							<p class="help-block">mm/dd/yyyy</p>
 							{if isset($eventdate_error)}
 								<span class="help-inline">{$eventdate_error}</span>
@@ -176,6 +174,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 		</div>
 	</div>
 </div>
-	<script src="bootstrap/js/bootstrap.bundle.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
 </body>
 </html>
