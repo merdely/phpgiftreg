@@ -146,8 +146,8 @@ Inspired from https://getbootstrap.com/docs/4.0/components/navbar/#supported-con
         </li>
 
         <li class="nav-item py-2 py-lg-1 col-12 col-lg-auto">
-          <div class="vr d-none d-lg-flex h-100 mx-lg-2 text-white"></div>
-          <hr class="d-lg-none my-2 text-white-50">
+          <div class="vr d-none d-lg-flex h-100 mx-lg-2"></div>
+          <hr class="d-lg-none my-2">
         </li>
 
         <li class="nav-item dropdown">
