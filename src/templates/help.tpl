@@ -40,7 +40,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 					<div class="card h-100">
 						<div class="card-header">Bookmarklet</div>
 						<div class="card-body">
-							<p>Drag the following bookmarklet to your browser's toolbar: <br />
+							<p>Drag the following bookmarklet to your browser's bookmark toolbar: <br />
 							<a class="card-link btn btn-primary" href="javascript: (function () {
 								var wishURL = window.location;
 								var wishTitle = document.title;
