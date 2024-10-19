@@ -78,7 +78,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 										<td>{if $row.admin}Yes{else}No{/if}</td>
 										<td align="right">
 											<a href="users.php?action=edit&userid={$row.userid}#userform"><img alt="Edit User" class="theme-image" data-light-src="images/pencil-light.png" data-dark-src="images/pencil-dark.png" src="images/pencil-light.png" border="0" title="Edit User" /></a>
-											<a rel="confirmdeleteuser" data-content="{$row.fullname|escape:'htmlall'}" href="users.php?action=delete&userid={$row.userid}"><img alt="Delete User" class="theme-icon" data-light-src="images/bin-light.png" data-dark-src="images/bin-dark.png" src="images/bin-light.png" border="0" title="Delete User" /></a>
+											<a rel="confirmdeleteuser" data-content="{$row.fullname|escape:'htmlall'}" href="users.php?action=delete&userid={$row.userid}"><img alt="Delete User" class="theme-image" data-light-src="images/bin-light.png" data-dark-src="images/bin-dark.png" src="images/bin-light.png" border="0" title="Delete User" /></a>
 											{if $row.email != ''}
 												<a href="users.php?action=reset&userid={$row.userid}&email={$row.email|escape:'htmlall'}"><img alt="Reset Password" class="theme-image" data-light-src="images/key-light.png" data-dark-src="images/key-dark.png" src="images/key-light.png" border="0" title="Reset Password" /></a>
 											{else}
