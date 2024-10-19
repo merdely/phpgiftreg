@@ -78,7 +78,7 @@ function getGlobalOptions() {
 		"email_xmailer" => "PHP/" . phpversion(),
 
 		/* Application name. */
-		"app_name" => "Gift Registry",
+		"app_name" => "Test Gift Registry",
 
 		/* Whether or not to show brief blurbs in certain spots which describe how 
 			features work.
