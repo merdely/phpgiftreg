@@ -72,9 +72,10 @@ if ($action == "approve") {
 			"Your Gift Registry application was approved.\r\n" .
 				"Your username is {$row["username"]} and your password is '$pwd'.\r\n" .
 					"Log in to {$_SERVER['REQUEST_SCHEME']}://{$_SERVER['HTTP_HOST']}/ and change your password under " .
-					"'Update Profile' (menu at the top/right of the page) as soon as possible.\r\n" .
+					"'Update Profile' as soon as possible:\r\n" .
+					"   {$_SERVER['REQUEST_SCHEME']}://{$_SERVER['HTTP_HOST']}/profile.php\r\n" .
 					"\r\n" .
-					"There is a browser bookmarklet at {$_SERVER['REQUEST_SCHEME']}://{$_SERVER['HTTP_HOST']}/help.php\r\n" .
+					"There is help and a browser bookmarklet at {$_SERVER['REQUEST_SCHEME']}://{$_SERVER['HTTP_HOST']}/help.php\r\n" .
 					"\r\n" .
 					"Once you've logged in, you can see the people you can shop for under 'Available People To Shopping For'. " .
 					"Click on the icon next to each person you want to shop for to see their lists.\r\n" .
