@@ -38,7 +38,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 			<div class="row justify-content-center">
 				<div class="col-sm" style="max-width: 500px;">
 					<div class="card mt-3">
-						<form name="loginform" id="loginform" method="post" action="login.php{if isset($from)}?from={$from}{/if}" class="well form-horizontal">
+						<form name="loginform" id="loginform" method="post" action="login.php{if isset($from)}?from={$from}{if isset($querystring)}&querystring={$querystring}{/if}{/if}" class="well form-horizontal">
 							<div class="card-header"><h1>Gift Registry</h1></div>
 							<div class="card-body">
 								{if isset($username)}

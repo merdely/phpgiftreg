@@ -20,7 +20,7 @@ $opt = $smarty->opt();
 
 session_start();
 if (!isset($_SESSION["userid"])) {
-	header("Location: " . getFullPath("login.php") . "?from=item.php");
+	header("Location: " . getFullPath("login.php") . "?from=item.php&querystring=" . urlencode($_SERVER['QUERY_STRING']));
 	exit;
 }
 else {

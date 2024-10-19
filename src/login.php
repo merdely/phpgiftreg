@@ -31,8 +31,14 @@ if (isset($_GET["action"])) {
 if (isset($_GET["from"])) {
 	$from = filter_var(trim($_GET["from"], FILTER_SANITIZE_STRING));;
 	$from = htmlspecialchars($from, ENT_QUOTES, 'UTF-8');
+} else {
+	$from = "";
+}
+
+if (isset($_GET["querystring"])) {
+	$querystring = trim($_GET["querystring"]);
 } else
-    $from = "";
+    $querystring = "";
 
 if (!empty($_POST["username"])) {
 	$username = filter_var(strtolower(trim($_REQUEST["username"])), FILTER_SANITIZE_STRING);
@@ -53,10 +59,11 @@ if (!empty($_POST["username"])) {
 			$_SESSION["show_helptext"] = $row["show_helptext"];
 			$opt['show_helptext'] = $row["show_helptext"];
 
-			if (in_array($from, $pages))
-				header("Location: " . getFullPath($from));
-			else
+			if (in_array($from, $pages)) {
+				header("Location: " . getFullPath($from) . "?" . urldecode($querystring));
+			} else {
 				header("Location: " . getFullPath("index.php"));
+			}
 			exit;
 		}
 	}
@@ -65,11 +72,13 @@ if (!empty($_POST["username"])) {
 	}
 
 	$smarty->assign('from', $from);
+	$smarty->assign('querystring', urlencode($querystring));
 	$smarty->assign('username', $username);
 	$smarty->display('login.tpl');
 }
 else {
 	$smarty->assign('from', $from);
+	$smarty->assign('querystring', urlencode($querystring));
 	$smarty->display('login.tpl');
 }
 ?>
