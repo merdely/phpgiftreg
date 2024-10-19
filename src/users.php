@@ -177,9 +177,10 @@ else if ($action == "insert") {
 			"Your Gift Registry account was created.\r\n" .
 				"Your username is $username and your password is '$pwd'.\r\n" .
 				"Log in to {$_SERVER['REQUEST_SCHEME']}://{$_SERVER['HTTP_HOST']}/ and change your password under\r\n" .
-				"Update Profile (menu at the top/right of the page) as soon as possible.\r\n" .
+				"'Update Profile' as soon as possible:\r\n" .
+				"   {$_SERVER['REQUEST_SCHEME']}://{$_SERVER['HTTP_HOST']}/profile.php\r\n" .
 				"\r\n" .
-				"There is a browser bookmarklet at {$_SERVER['REQUEST_SCHEME']}://{$_SERVER['HTTP_HOST']}/help.php\r\n" .
+				"There is help and a browser bookmarklet at {$_SERVER['REQUEST_SCHEME']}://{$_SERVER['HTTP_HOST']}/help.php\r\n" .
 				"\r\n" .
 				"Once you've logged in, you can see the people you can shop for under 'Available People To Shopping For'. " .
 				"Click on the icon next to each person you want to shop for to see their lists.\r\n" .
@@ -230,7 +231,8 @@ else if ($action == "reset") {
 		"Gift Registry password reset",
 		"Your Gift Registry password was reset to '$pwd'.\r\n" .
 		"Log in to {$_SERVER['REQUEST_SCHEME']}://{$_SERVER['HTTP_HOST']}/ and change your password under\r\n" .
-		"Update Profile (menu at the top/right of the page) as soon as possible.",
+		"Update Profile as soon as possible:\r\n" .
+		"   {$_SERVER['REQUEST_SCHEME']}://{$_SERVER['HTTP_HOST']}/profile.php\r\n",
 		"From: {$opt["email_from"]}\r\nReply-To: {$opt["email_reply_to"]}\r\nX-Mailer: {$opt["email_xmailer"]}\r\n"
 	) or die("Mail not accepted for $email");
 	header("Location: " . getFullPath("users.php?message=Password+reset."));
