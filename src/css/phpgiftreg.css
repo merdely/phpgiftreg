@@ -1,0 +1,20 @@
+/* Ensure the main content takes up available space */
+html, body {
+  height: 100%;
+}
+body {
+  display: flex;
+  flex-direction: column;
+}
+main {
+  flex: 1;
+}
+.icon {
+  fill: currentcolor;
+}
+
+.boldicon {
+  fill: currentcolor;
+  stroke: currentcolor;
+  stroke-width: 1;
+}

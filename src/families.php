@@ -20,8 +20,9 @@ $opt = $smarty->opt();
 
 session_start();
 $haserror = false;
+$error_message = "";
 if (!isset($_SESSION["userid"])) {
-	header("Location: " . getFullPath("login.php"));
+	header("Location: " . getFullPath("login.php") . "?from=families.php");
 	exit;
 }
 else if ($_SESSION["admin"] != 1) {
@@ -32,24 +33,44 @@ else {
 	$userid = $_SESSION["userid"];
 }
 if (!empty($_GET["message"])) {
-    $message = $_GET["message"];
+	$message = filter_var(trim($_GET["message"], FILTER_SANITIZE_STRING));;
+	$message = htmlspecialchars($message, ENT_QUOTES, 'UTF-8');
 }
 
 $action = empty($_GET["action"]) ? "" : $_GET["action"];
 
-if (!empty($_GET["familyid"]))
-	$familyid = (int) $_GET["familyid"];
-else
-	$familyid = 1;
+if (isset($_GET["familyid"])) {
+	$familyid = filter_var(trim($_GET["familyid"]), FILTER_SANITIZE_NUMBER_INT);
+
+	if (filter_var($familyid, FILTER_SANITIZE_NUMBER_INT) === false || $familyid == "" || !is_numeric($familyid) || $familyid < 0) {
+		die("Invalid familyid ({$_GET["familyid"]})");
+	}
+}
+
+if (empty($familyid)) $familyid = 1;
+
+if (isset($_GET["members"])) {
+	$members = isset($_GET["members"]) ? $_GET["members"] : array();
+	if (!is_array($members)) {
+		die("Invalid data for members ({$_GET["members"]})");
+	}
+	foreach ($members as $index => $member) {
+		$members[$index] = filter_var($member, FILTER_SANITIZE_NUMBER_INT);
+		if (filter_var($members[$index], FILTER_SANITIZE_NUMBER_INT) === false) {
+			die("Invalid data for members ({$_GET["members"]})");
+		}
+	}
+}
 
 if ($action == "insert" || $action == "update") {
 	/* validate the data. */
-	$familyname = trim($_GET["familyname"]);
-		
-	$haserror = false;
+	$familyname = filter_var(trim($_GET["familyname"]), FILTER_SANITIZE_STRING);
+	$familyname = htmlspecialchars($familyname, ENT_QUOTES, 'UTF-8');
+
 	if ($familyname == "") {
 		$haserror = true;
-		$familyname_error = "A family name is required.";
+		$error_message = "A family name is required.";
+		$familyname_error = true;
 	}
 }
 
@@ -63,7 +84,7 @@ if ($action == "delete") {
 		$stmt = $smarty->dbh()->prepare("DELETE FROM {$opt["table_prefix"]}families WHERE familyid = ?");
 		$stmt->bindValue(1, $familyid, PDO::PARAM_INT);
 		$stmt->execute();
-	
+
 		header("Location: " . getFullPath("families.php?message=Family+deleted."));
 		exit;
 	}
@@ -100,7 +121,7 @@ else if ($action == "insert") {
 		catch (PDOException $e) {
 			die("sql exception: " . $e->getMessage());
 		}
-		
+
 		header("Location: " . getFullPath("families.php?message=Family+added."));
 		exit;
 	}
@@ -118,13 +139,12 @@ else if ($action == "update") {
 		catch (PDOException $e) {
 			die("sql exception: " . $e->getMessage());
 		}
-		
+
 		header("Location: " . getFullPath("families.php?message=Family+updated."));
-		exit;		
+		exit;
 	}
 }
 else if ($action == "members") {
-	$members = isset($_GET["members"]) ? $_GET["members"] : array();
 	try {
 		/* first, delete all memberships for this family. */
 		$stmt = $smarty->dbh()->prepare("DELETE FROM {$opt["table_prefix"]}memberships WHERE familyid = ?");
@@ -142,7 +162,7 @@ else if ($action == "members") {
 	catch (PDOException $e) {
 		die("sql exception: " . $e->getMessage());
 	}
-	
+
 	header("Location: " . getFullPath("families.php?message=Members+changed."));
 	exit;
 }
@@ -176,6 +196,9 @@ try {
 
 	$smarty->assign('action', $action);
 	$smarty->assign('haserror', $haserror);
+	if ($error_message != "") {
+		$smarty->assign('error_message', $error_message);
+	}
 	if (isset($familyname_error)) {
 		$smarty->assign('familyname_error', $familyname_error);
 	}

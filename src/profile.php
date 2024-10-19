@@ -21,7 +21,7 @@ $opt = $smarty->opt();
 
 session_start();
 if (!isset($_SESSION["userid"])) {
-	header("Location: " . getFullPath("login.php"));
+	header("Location: " . getFullPath("login.php") . "?from=profile.php");
 	exit;
 }
 else {
@@ -31,7 +31,7 @@ else {
 $action = "";
 if (!empty($_POST["action"])) {
 	$action = $_POST["action"];
-	
+
 	if ($action == "changepwd") {
 		$newpwd = $_POST["newpwd"];
 
@@ -64,7 +64,7 @@ if (!empty($_POST["action"])) {
 			$stmt->bindParam(4, $show_helptext, PDO::PARAM_BOOL);
 			$stmt->bindParam(5, $comment, PDO::PARAM_STR);
 			$stmt->bindParam(6, $userid, PDO::PARAM_INT);
-		
+
 			$stmt->execute();
 
 			$_SESSION["fullname"] = $fullname;

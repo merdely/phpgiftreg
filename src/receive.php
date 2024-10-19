@@ -20,7 +20,7 @@ $opt = $smarty->opt();
 
 session_start();
 if (!isset($_SESSION["userid"])) {
-	header("Location: " . getFullPath("login.php"));
+	header("Location: " . getFullPath("login.php") . "?from=receive.php");
 	exit;
 }
 else {
@@ -28,7 +28,30 @@ else {
 }
 
 $action = (!empty($_GET["action"]) ? $_GET["action"] : "");
-$itemid = (int) $_GET["itemid"];
+if (isset($_GET["itemid"])) {
+	$itemid = filter_var(trim($_GET["itemid"]), FILTER_SANITIZE_NUMBER_INT);
+
+	if (filter_var($itemid, FILTER_SANITIZE_NUMBER_INT) === false || $itemid == "" || !is_numeric($itemid) || $itemid < 0) {
+		die("Invalid itemid ({$_GET["itemid"]})");
+	}
+	$itemid = (int) $itemid;
+}
+
+if (isset($_GET["buyer"])) {
+	$buyer = filter_var(trim($_GET["buyer"]), FILTER_SANITIZE_NUMBER_INT);
+
+	if (filter_var($buyer, FILTER_SANITIZE_NUMBER_INT) === false || $buyer == "" || !is_numeric($buyer) || $buyer < 0) {
+		die("Invalid buyer ({$_GET["buyer"]})");
+	}
+}
+
+if (isset($_GET["quantity"])) {
+	$quantity = filter_var(trim($_GET["quantity"]), FILTER_SANITIZE_NUMBER_INT);
+
+	if (filter_var($quantity, FILTER_SANITIZE_NUMBER_INT) === false || $quantity == "" || !is_numeric($quantity) || $quantity < 0) {
+		die("Invalid quantity ({$_GET["quantity"]})");
+	}
+}
 
 // get details. is it our item? is this a single-quantity item?
 try {
@@ -65,13 +88,13 @@ try {
 	}
 	else if ($action == "receive") {
 		// $actual will be a negative number, so let's flip it.
-		$actual = -adjustAllocQuantity($itemid, (int) $_GET["buyer"], 1, -1 * (int) $_GET["quantity"], $smarty->dbh(), $smarty->opt());
-	
-		if ($actual < (int) $_GET["quantity"]) {
+		$actual = -adjustAllocQuantity($itemid, (int) $buyer, 1, -1 * (int) $quantity, $smarty->dbh(), $smarty->opt());
+
+		if ($actual < (int) $quantity) {
 			// $userid didn't have that many bought, so some might have been reserved.
-			$actual += -adjustAllocQuantity($itemid,(int) $_GET["buyer"],0,-1 * ((int) $_GET["quantity"] - $actual), $smarty->dbh(), $smarty->opt());
+			$actual += -adjustAllocQuantity($itemid,(int) $buyer,0,-1 * ((int) $quantity - $actual), $smarty->dbh(), $smarty->opt());
 		}
-	
+
 		if ($actual == $quantity) {
 			// now they're all gone.
 			deleteImageForItem($itemid, $smarty->dbh(), $smarty->opt());
@@ -86,7 +109,7 @@ try {
 			$stmt->bindParam(2, $itemid, PDO::PARAM_INT);
 			$stmt->execute();
 		}
-	
+
 		header("Location: " . getFullPath("index.php?message=Item+marked+as+received."));
 		exit;
 	}

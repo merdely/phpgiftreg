@@ -20,7 +20,7 @@ $opt = $smarty->opt();
 
 session_start();
 if (!isset($_SESSION["userid"])) {
-	header("Location: " . getFullPath("login.php"));
+	header("Location: " . getFullPath("login.php") . "?from=categories.php");
 	exit;
 }
 else if ($_SESSION["admin"] != 1) {
@@ -31,38 +31,50 @@ else {
 	$userid = $_SESSION["userid"];
 }
 if (!empty($_GET["message"])) {
-    $message = $_GET["message"];
+	$message = filter_var(trim($_GET["message"], FILTER_SANITIZE_STRING));;
+	$message = htmlspecialchars($message, ENT_QUOTES, 'UTF-8');
 }
 
+$haserror = false;
+$error_message = "";
 $action = isset($_GET["action"]) ? $_GET["action"] : "";
 
 if ($action == "insert" || $action == "update") {
 	/* validate the data. */
-	$category = trim($_GET["category"]);
-		
-	$haserror = false;
+	$category = filter_var(trim($_GET["category"]), FILTER_SANITIZE_STRING);
+	$category = htmlspecialchars($category, ENT_QUOTES, 'UTF-8');
+
 	if ($category == "") {
 		$haserror = true;
-		$category_error = "A category is required.";
+		$error_message = trim("$error_message A category is required.");
+		$category_error = true;
+	}
+}
+
+if (isset($_GET["categoryid"])) {
+	$categoryid = filter_var(trim($_GET["categoryid"]), FILTER_SANITIZE_NUMBER_INT);
+
+	if (filter_var($categoryid, FILTER_SANITIZE_NUMBER_INT) === false || $categoryid == "" || !is_numeric($categoryid) || $categoryid < 0) {
+		die("Invalid categoryid ({$_GET["categoryid"]})");
 	}
 }
 
 if ($action == "delete") {
 	/* first, NULL all category FKs for items that use this category. */
 	$stmt = $smarty->dbh()->prepare("UPDATE {$opt["table_prefix"]}items SET category = NULL WHERE category = ?");
-	$stmt->bindValue(1, (int) $_GET["categoryid"], PDO::PARAM_INT);
+	$stmt->bindValue(1, (int) $categoryid, PDO::PARAM_INT);
 	$stmt->execute();
 
 	$stmt = $smarty->dbh()->prepare("DELETE FROM {$opt["table_prefix"]}categories WHERE categoryid = ?");
-	$stmt->bindValue(1, (int) $_GET["categoryid"], PDO::PARAM_INT);
+	$stmt->bindValue(1, (int) $categoryid, PDO::PARAM_INT);
 	$stmt->execute();
-	
+
 	header("Location: " . getFullPath("categories.php?message=Category+deleted."));
 	exit;
 }
 else if ($action == "edit") {
 	$stmt = $smarty->dbh()->prepare("SELECT category FROM {$opt["table_prefix"]}categories WHERE categoryid = ?");
-	$stmt->bindValue(1, (int) $_GET["categoryid"], PDO::PARAM_INT);
+	$stmt->bindValue(1, (int) $categoryid, PDO::PARAM_INT);
 	$stmt->execute();
 	if ($row = $stmt->fetch()) {
 		$category = $row["category"];
@@ -76,7 +88,7 @@ else if ($action == "insert") {
 		$stmt = $smarty->dbh()->prepare("INSERT INTO {$opt["table_prefix"]}categories(categoryid,category) VALUES(NULL, ?)");
 		$stmt->bindParam(1, $category, PDO::PARAM_STR);
 		$stmt->execute();
-		
+
 		header("Location: " . getFullPath("categories.php?message=Category+added."));
 		exit;
 	}
@@ -87,11 +99,11 @@ else if ($action == "update") {
 					"SET category = ? " .
 					"WHERE categoryid = ?");
 		$stmt->bindParam(1, $category, PDO::PARAM_STR);
-		$stmt->bindValue(2, (int) $_GET["categoryid"], PDO::PARAM_INT);
+		$stmt->bindValue(2, (int) $categoryid, PDO::PARAM_INT);
 		$stmt->execute();
-		
+
 		header("Location: " . getFullPath("categories.php?message=Category+updated."));
-		exit;		
+		exit;
 	}
 }
 else {
@@ -113,8 +125,8 @@ if (isset($action)) {
 	$smarty->assign('action', $action);
 }
 $smarty->assign('categories', $categories);
-if (isset($_GET["categoryid"])) {
-	$smarty->assign('categoryid', (int) $_GET["categoryid"]);
+if (isset($categoryid)) {
+	$smarty->assign('categoryid', (int) $categoryid);
 }
 if (isset($message)) {
 	$smarty->assign('message', $message);
@@ -124,5 +136,8 @@ if (isset($category_error)) {
 	$smarty->assign('category_error', $category_error);
 }
 $smarty->assign('haserror', isset($haserror) ? $haserror : false);
+if ($error_message != "") {
+	$smarty->assign('error_message', $error_message);
+}
 $smarty->display('categories.tpl');
 ?>

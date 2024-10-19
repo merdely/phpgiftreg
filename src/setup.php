@@ -48,7 +48,7 @@ if (isset($_POST["action"])) {
 		$stmt = dbh($opt)->prepare("INSERT INTO {$opt["table_prefix"]}families(familyname) VALUES(?)");
 		$stmt->bindParam(1, $familyname, PDO::PARAM_STR);
 		$stmt->execute();
-						         
+
 		// 2. get the familyid.
 		$stmt = dbh($opt)->prepare("SELECT MAX(familyid) AS familyid FROM {$opt["table_prefix"]}families");
 		$stmt->execute();
@@ -188,7 +188,7 @@ else {
 	$smarty = new MySmarty();
 	$smarty->testInstall();
 	?>
-	<form name="setupform" id="setupform" method="post" action="setup.php">	
+	<form name="setupform" id="setupform" method="post" action="setup.php">
 		<input type="hidden" name="action" value="setup">
 		<div align="center">
 			<table cellpadding="3" class="partbox">

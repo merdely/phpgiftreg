@@ -4,6 +4,8 @@
  * Licensed under the Creative Commons Attribution 3.0 Unported License.
  */
 
+// Downloaded from https://getbootstrap.com/docs/5.3/assets/js/color-modes.js
+
 (() => {
   'use strict'
 
@@ -36,21 +38,34 @@
       return
     }
 
-    const themeSwitcherText = document.querySelector('#bd-theme-text')
-    const activeThemeIcon = document.querySelector('.theme-icon-active use')
-    const btnToActive = document.querySelector(`[data-bs-theme-value="${theme}"]`)
-    const svgOfActiveBtn = btnToActive.querySelector('svg use').getAttribute('href')
-
     document.querySelectorAll('[data-bs-theme-value]').forEach(element => {
       element.classList.remove('active')
       element.setAttribute('aria-pressed', 'false')
     })
 
-    btnToActive.classList.add('active')
-    btnToActive.setAttribute('aria-pressed', 'true')
-    activeThemeIcon.setAttribute('href', svgOfActiveBtn)
-    const themeSwitcherLabel = `${themeSwitcherText.textContent} (${btnToActive.dataset.bsThemeValue})`
-    themeSwitcher.setAttribute('aria-label', themeSwitcherLabel)
+    // Changes by github.com/merdely: change theme images throughout page
+    document.querySelectorAll('.theme-image').forEach(function(image) {
+      image.src = image.getAttribute('data-' +
+        document.documentElement.getAttribute('data-bs-theme')
+        + '-src');
+    });
+
+    // Changes by github.com/merdely: use img instead of svg
+    document.querySelectorAll('.theme-image-active').forEach(function(image) {
+      image.src = image.getAttribute('data-' + theme + '-' +
+        document.documentElement.getAttribute('data-bs-theme')
+        + '-src');
+    });
+    document.querySelectorAll('.theme-image-check').forEach(function(image) {
+      // image.parentElement.classList.remove('active');
+      // image.parentElement.setAttribute('aria-pressed', 'false');
+      image.classList.add('d-none');
+    });
+    document.querySelectorAll(`#theme-${theme}`).forEach(function(image) {
+      // image.parentElement.classList.add('active');
+      // image.parentElement.setAttribute('aria-pressed', 'true');
+      image.classList.remove('d-none');
+    });
 
     if (focus) {
       themeSwitcher.focus()
@@ -60,7 +75,8 @@
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
     const storedTheme = getStoredTheme()
     if (storedTheme !== 'light' && storedTheme !== 'dark') {
-      setTheme(getPreferredTheme())
+      setTheme(getPreferredTheme());
+      showActiveTheme(getPreferredTheme());
     }
   })
 

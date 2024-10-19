@@ -20,41 +20,50 @@ $opt = $smarty->opt();
 
 session_start();
 if (!isset($_SESSION["userid"])) {
-	header("Location: " . getFullPath("login.php"));
+	header("Location: " . getFullPath("login.php") . "?from=mylist.php");
 	exit;
 }
 else {
 	$userid = $_SESSION["userid"];
 }
 
-if (empty($_GET["sort"]))
-	$sort = "source";
-else
-	$sort = $_GET["sort"];
-	
-switch($sort) {
-	case "category":
-		$sortby = "category, source, price";
-		break;
-	case "description":
-		$sortby = "description, price";
-		break;
-	case "ranking":
-		$sortby = "rankorder DESC, source, price";
-		break;
-	case "source":
-		$sortby = "source, category, rankorder DESC";
-		break;
-	case "price":
-		$sortby = "quantity * price, category, source";
-		break;
-	default:
-		$sortby = "rankorder DESC, source, price";
+if (!empty($_GET["sortdir"])) {
+	$sortdir = strtoupper(trim($_GET["sortdir"])) == "DESC" ? "DESC" : "ASC";
+} else {
+	$sortdir = "ASC";
+}
+if (empty($_GET["sort"])) {
+	$sortby = "name";
+	$sort = "name";
+} else {
+	$sort = filter_var(trim($_GET["sort"], FILTER_SANITIZE_STRING));;
+	$sort = htmlspecialchars($sort, ENT_QUOTES, 'UTF-8');
+	switch($sort) {
+		case "category":
+			$sortby = "category $sortdir, source, price";
+			$sort = "category";
+			break;
+		case "name":
+			$sortby = "name $sortdir, price";
+			$sort = "name";
+			break;
+		case "source":
+			$sortby = "source $sortdir, category, rankorder";
+			$sort = "source";
+			break;
+		case "price":
+			$sortby = "quantity * price $sortdir, category, source";
+			$sort = "price";
+			break;
+		default:
+			$sortby = "rankorder $sortdir, source, price";
+			$sort = "ranking";
+	}
 }
 
 try {
 	// not worried about SQL injection since $sortby is calculated above.
-	$stmt = $smarty->dbh()->prepare("SELECT description, source, price, i.comment, i.quantity, i.quantity * i.price AS total, rendered, c.category " .
+	$stmt = $smarty->dbh()->prepare("SELECT name, description, source, price, r.title as ranktitle, i.comment, i.quantity, i.quantity * i.price AS total, rendered, c.category " .
 			"FROM {$opt["table_prefix"]}items i " .
 			"INNER JOIN {$opt["table_prefix"]}users u ON u.userid = i.userid " .
 			"INNER JOIN {$opt["table_prefix"]}ranks r ON r.ranking = i.ranking " .
@@ -77,6 +86,8 @@ try {
 		$shoplist[] = $row;
 	}
 
+	$smarty->assign('sort', $sort);
+	$smarty->assign('sortdir', $sortdir);
 	$smarty->assign('shoplist', $shoplist);
 	$smarty->assign('totalprice', formatPrice($totalprice, $opt));
 	$smarty->assign('itemcount', $itemcount);

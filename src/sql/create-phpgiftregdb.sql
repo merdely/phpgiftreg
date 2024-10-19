@@ -24,16 +24,16 @@ CREATE TABLE `categories` (
 -- Dumping data for table `categories`
 --
 
-INSERT INTO `categories` VALUES (1,'Miscellaneous');
+INSERT INTO `categories` VALUES (1,'Misc');
 INSERT INTO `categories` VALUES (2,'Music');
-INSERT INTO `categories` VALUES (3,'Video Games');
+INSERT INTO `categories` VALUES (3,'Games');
 INSERT INTO `categories` VALUES (4,'Clothing');
-INSERT INTO `categories` VALUES (5,'Movies/DVD');
-INSERT INTO `categories` VALUES (6,'Gift Certificates');
+INSERT INTO `categories` VALUES (5,'Movies');
+INSERT INTO `categories` VALUES (6,'Gift Cards');
 INSERT INTO `categories` VALUES (7,'Hobbies');
 INSERT INTO `categories` VALUES (8,'Household');
 INSERT INTO `categories` VALUES (9,'Electronics');
-INSERT INTO `categories` VALUES (10,'Ornaments/Figurines');
+INSERT INTO `categories` VALUES (10,'Decorations');
 INSERT INTO `categories` VALUES (11,'Automotive');
 INSERT INTO `categories` VALUES (12,'Toys');
 INSERT INTO `categories` VALUES (13,'Jewelry');

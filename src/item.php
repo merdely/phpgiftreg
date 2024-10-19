@@ -20,7 +20,7 @@ $opt = $smarty->opt();
 
 session_start();
 if (!isset($_SESSION["userid"])) {
-	header("Location: " . getFullPath("login.php"));
+	header("Location: " . getFullPath("login.php") . "?from=item.php");
 	exit;
 }
 else {
@@ -37,7 +37,11 @@ $category = 1;
 $ranking = 3;
 $comment = "";
 $quantity = 1;
+$image_url = "";
 $image_filename = "";
+$image_base_filename = "";
+$haserror = false;
+$error_message = "";
 
 // for security, let's make sure that if an itemid was passed in, it belongs
 // to $userid.  all operations on this page should only be performed by
@@ -60,7 +64,7 @@ if (isset($_REQUEST["itemid"]) && $_REQUEST["itemid"] != "") {
 $action = "";
 if (!empty($_REQUEST["action"])) {
 	$action = $_REQUEST["action"];
-	
+
 	if ($action == "insert" || $action == "update") {
 		/* validate the data. */
 		$name = trim($_REQUEST["name"]);
@@ -68,24 +72,28 @@ if (!empty($_REQUEST["action"])) {
 		$image_url = isset($_REQUEST["image_url"]) ? trim($_REQUEST["image_url"]) : "";
 		$description = isset($_REQUEST["description"]) ? trim($_REQUEST["description"]) : "";
 		$price = isset($_REQUEST["price"]) ? str_replace(",","",trim($_REQUEST["price"])) : "0";
+		$price = preg_replace("/^\$/", "", $price);
 		$source = isset($_REQUEST["source"]) ? trim($_REQUEST["source"]) : "";
 		$url = isset($_REQUEST["url"]) ? trim($_REQUEST["url"]) : "";
 		$category = isset($_REQUEST["category"]) ? trim($_REQUEST["category"]) : "1";
 		$ranking = isset($_REQUEST["ranking"]) ? $_REQUEST["ranking"] : "3";
 		$comment = isset($_REQUEST["comment"]) ? $_REQUEST["comment"] : "";
+		if (isset($_REQUEST["pricesymbol"]) && $_REQUEST["pricesymbol"] != $opt["currency_symbol"]) {
+			$price = "";
+			$comment = trim("$comment Price not in {$opt['currency_symbol']}, it is {$_REQUEST["pricesymbol"]}{$_REQUEST['price']}.");
+		}
 		$quantity = isset($_REQUEST["quantity"]) ? (int) $_REQUEST["quantity"] : 1;
 
-		$haserror = false;
 		if ($name == "") {
 			$haserror = true;
-			$name_error = "A name is required.";
+			$error_message = trim("$error_message A name is required.");
+			$name_error = true;
 		}
 		if ($image_url != "" && preg_match("/^http(s)?:\/\/([^\/]+)/i",$image_url)) {
 			$image_file_data = file_get_contents($image_url);
 			if ($image_file_data !== false) {
 				$temp_image = tempnam("/tmp","");
 				file_put_contents($temp_image, $image_file_data);
-                error_log("MWE: temp_image: $temp_image");
 				$fh = fopen($temp_image, 'rb');
 				if ($fh) {
 					$header = fread($fh, 8);
@@ -105,7 +113,6 @@ if (!empty($_REQUEST["action"])) {
 						$ext = 'webp';
 					}
 				}
-                error_log("MWE: ext: $ext");
 				if ($ext != "") {
 					$parts = pathinfo($_SERVER["SCRIPT_FILENAME"]);
 					$upload_dir = $parts['dirname'];
@@ -115,39 +122,45 @@ if (!empty($_REQUEST["action"])) {
 					unlink($temp_name);
 					// here's the name we really want to use.  full path is included.
 					$image_filename = $temp_name . "." . $ext;
-                    error_log("MWE: image_filename: $image_filename");
 					// move the PHP temporary file to that filename.
 					rename($temp_image, $image_filename);
 					// fix permissions on the new file
 					chmod($image_filename, 0644);
 					// the name we're going to record in the DB is the filename without the path.
 					$image_base_filename = basename($image_filename);
-                    error_log("MWE: image_base_filename: $image_base_filename");
 				}
 			}
 		}
 		if ($bookmarklet == "1") {
-			if ($source == "" && preg_match("/^Amazon.com:/", $name)) {
+			if ($source == "" && preg_match("/^Amazon.com:? *\| */", $name)) {
 				$source = "Amazon";
 			}
 			if ($source == "" && $url != "") {
 				$source = preg_replace("/^(https?:\/\/)?([^\/]+)(\/.*)?$/", "$2", $url);
+				$source = preg_replace("/^www\./", "", $source);
+				if (preg_match("/([a-zA-Z0-9_-]+)\.(com|net|org|biz|co\.uk)$/", $source)) {
+					$source = preg_replace("/([a-zA-Z0-9_-]+)\.(com|net|org|biz|co\.uk)$/", "$1", $source);
+					$source = ucfirst($source);
+				}
 			}
-			$name = preg_replace("/^Amazon.com: /", "", $name);
+			$name = preg_replace("/^Amazon.com:? *\|? */", "", $name);
 			$name = preg_replace("/ : [A-Za-z0-9 &_,-]+/", "", $name);
 		}
-		if (strlen($name) > 100 && $description == "") {
+		if (strlen($name) > 60 && $description == "") {
 			$description = $name;
 		}
-		if (strlen($name) > 100) {
+		if (strlen($name) > 50) {
+			$name = preg_replace("/ at Amazon.*$/", "", $name);
+			$name = preg_replace("/^(.{30,100}?)([,.!?;:]).*$/", "$1", $name);
 			$name = substr($name, 0, 100);
 		}
 		if ($price == "" || !preg_match("/^\d*(\.\d{2})?$/i",$price)) {
 			$price = 0;
 		}
-		if ($url != "" && !preg_match("/^http(s)?:\/\/([^\/]+)/i",$url)) {
+		if ($url != "" && !filter_var($url, FILTER_VALIDATE_URL)) {
 			$haserror = true;
-			$url_error = "A well-formed URL is required in the format <i>http://www.somesite.net/somedir/somefile.html</i>.";
+			$error_message = trim("$error_message A well-formed URL is required in the format http://www.somesite.net/somedir/somefile.html.");
+			$url_error = true;
 		}
 		if ($category == "") {
 			$category = 1;
@@ -160,7 +173,7 @@ if (!empty($_REQUEST["action"])) {
 		}
 	}
 
-	if (!isset($image_url) && isset($haserror) && !$haserror && isset($_REQUEST["image"])) {
+	if ($image_url == "" && $haserror !== true && isset($_REQUEST["image"])) {
 		if ($_REQUEST["image"] == "remove" || $_REQUEST["image"] == "replace") {
 			deleteImageForItem((int) $_REQUEST["itemid"], $smarty->dbh(), $smarty->opt());
 		}
@@ -186,7 +199,7 @@ if (!empty($_REQUEST["action"])) {
 			$image_base_filename = basename($image_filename);
 		}
 	}
-	
+
 	if ($action == "delete") {
 		try {
 			/* find out if this item is bought or reserved. */
@@ -208,7 +221,7 @@ if (!empty($_REQUEST["action"])) {
 						$smarty->opt());
 				}
 			}
-	
+
 			deleteImageForItem((int) $_REQUEST["itemid"], $smarty->dbh(), $smarty->opt());
 
 			$stmt = $smarty->dbh()->prepare("DELETE FROM {$opt["table_prefix"]}items WHERE itemid = ?");
@@ -216,7 +229,7 @@ if (!empty($_REQUEST["action"])) {
 			$stmt->execute();
 
 			// TODO: are we leaking allocs records here?
-		
+
 			stampUser($userid, $smarty->dbh(), $smarty->opt());
 			processSubscriptions($userid, $action, $name, $smarty->dbh(), $smarty->opt());
 
@@ -260,7 +273,7 @@ if (!empty($_REQUEST["action"])) {
 	else if ($action == "insert") {
 		if (!$haserror) {
 			$stmt = $smarty->dbh()->prepare("INSERT INTO {$opt["table_prefix"]}items(userid,name,description,price,source,category,url,ranking,comment,quantity,image_filename) " .
-			    "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+				"VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 			$stmt->bindParam(1, $userid, PDO::PARAM_INT);
 			$stmt->bindParam(2, $name, PDO::PARAM_STR);
 			$stmt->bindParam(3, $description, PDO::PARAM_STR);
@@ -271,12 +284,12 @@ if (!empty($_REQUEST["action"])) {
 			$stmt->bindParam(8, $ranking, PDO::PARAM_INT);
 			$stmt->bindParam(9, $comment, PDO::PARAM_STR);
 			$stmt->bindParam(10, $quantity, PDO::PARAM_INT);
-            if (!isset($image_base_filename) || $image_base_filename == "") {
-                $image_base_filename = NULL;
-            }
+			if (!isset($image_base_filename) || $image_base_filename == "") {
+				$image_base_filename = NULL;
+			}
 			$stmt->bindParam(11, $image_base_filename, PDO::PARAM_STR);
 			$stmt->execute();
-			
+
 			stampUser($userid, $smarty->dbh(), $smarty->opt());
 			processSubscriptions($userid, $action, $name, $smarty->dbh(), $smarty->opt());
 
@@ -295,20 +308,20 @@ if (!empty($_REQUEST["action"])) {
 					"category = ?, " .
 					"url = ?, " .
 					"ranking = ?, " .
-					"comment = ?, " . 
+					"comment = ?, " .
 					"quantity = ? " .
 					($image_base_filename != "" ? ", image_filename = ? " : "") .
 					"WHERE itemid = ?");
 			$stmt->bindParam(1, $name, PDO::PARAM_STR);
 			$stmt->bindParam(2, $description, PDO::PARAM_STR);
 			$stmt->bindParam(3, $price);
-		    $stmt->bindParam(4, $source, PDO::PARAM_STR);
-		    $stmt->bindParam(5, $category, PDO::PARAM_INT);
-		    $stmt->bindParam(6, $url, PDO::PARAM_STR);
-		    $stmt->bindParam(7, $ranking, PDO::PARAM_INT);
-		    $stmt->bindParam(8, $comment, PDO::PARAM_STR);
-		    $stmt->bindParam(9, $quantity, PDO::PARAM_INT);
-		    if ($image_base_filename != "") {
+			$stmt->bindParam(4, $source, PDO::PARAM_STR);
+			$stmt->bindParam(5, $category, PDO::PARAM_INT);
+			$stmt->bindParam(6, $url, PDO::PARAM_STR);
+			$stmt->bindParam(7, $ranking, PDO::PARAM_INT);
+			$stmt->bindParam(8, $comment, PDO::PARAM_STR);
+			$stmt->bindParam(9, $quantity, PDO::PARAM_INT);
+			if ($image_base_filename != "") {
 				$stmt->bindParam(10, $image_base_filename, PDO::PARAM_STR);
 				$stmt->bindValue(11, (int) $_REQUEST["itemid"], PDO::PARAM_INT);
 			}
@@ -321,7 +334,7 @@ if (!empty($_REQUEST["action"])) {
 			processSubscriptions($userid, $action, $name, $smarty->dbh(), $smarty->opt());
 
 			header("Location: " . getFullPath("index.php"));
-			exit;		
+			exit;
 		}
 	}
 	else {
@@ -337,7 +350,7 @@ while ($row = $stmt->fetch()) {
 	$categories[] = $row;
 }
 
-$stmt = $smarty->dbh()->prepare("SELECT ranking, title FROM {$opt["table_prefix"]}ranks ORDER BY rankorder DESC");
+$stmt = $smarty->dbh()->prepare("SELECT ranking, title FROM {$opt["table_prefix"]}ranks ORDER BY rankorder");
 $stmt->execute();
 $ranks = array();
 while ($row = $stmt->fetch()) {
@@ -347,6 +360,9 @@ while ($row = $stmt->fetch()) {
 $smarty->assign('userid', $userid);
 $smarty->assign('action', $action);
 $smarty->assign('haserror', isset($haserror) ? $haserror : false);
+if ($error_message != "") {
+	$smarty->assign('error_message', $error_message);
+}
 if (isset($_REQUEST['itemid'])) {
 	$smarty->assign('itemid', (int) $_REQUEST['itemid']);
 }
@@ -386,5 +402,5 @@ $smarty->assign('image_filename', $image_filename);
 $smarty->assign('comment', $comment);
 $smarty->assign('categories', $categories);
 $smarty->assign('ranks', $ranks);
-$smarty->display('item.tpl');
+header("Location: " . getFullPath("index.php"));
 ?>

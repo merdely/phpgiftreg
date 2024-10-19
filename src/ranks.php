@@ -20,7 +20,7 @@ $opt = $smarty->opt();
 
 session_start();
 if (!isset($_SESSION["userid"])) {
-	header("Location: " . getFullPath("login.php"));
+	header("Location: " . getFullPath("login.php") . "?from=ranks.php");
 	exit;
 }
 else if ($_SESSION["admin"] != 1) {
@@ -31,47 +31,68 @@ else {
 	$userid = $_SESSION["userid"];
 }
 if (!empty($_GET["message"])) {
-    $message = $_GET["message"];
+	$message = filter_var(trim($_GET["message"], FILTER_SANITIZE_STRING));;
+	$message = htmlspecialchars($message, ENT_QUOTES, 'UTF-8');
 }
+
+if (isset($_GET["ranking"])) {
+	$ranking = filter_var(trim($_GET["ranking"]), FILTER_SANITIZE_NUMBER_INT);
+
+	if (filter_var($ranking, FILTER_SANITIZE_NUMBER_INT) === false || $ranking == "" || !is_numeric($ranking) || $ranking < 0) {
+		die("Invalid ranking ({$_GET["ranking"]})");
+	}
+}
+
+if (isset($_GET["rankorder"])) {
+	$rankorder = filter_var(trim($_GET["rankorder"]), FILTER_SANITIZE_NUMBER_INT);
+
+	if (filter_var($rankorder, FILTER_SANITIZE_NUMBER_INT) === false || $rankorder == "" || !is_numeric($rankorder) || $rankorder < 0) {
+		die("Invalid rankorder ({$_GET["rankorder"]})");
+	}
+}
+
+$haserror = false;
+$error_message = "";
 
 $action = isset($_GET["action"]) ? $_GET["action"] : "";
 
 if ($action == "insert" || $action == "update") {
 	/* validate the data. */
-	$title = trim($_GET["title"]);
-	$rendered = trim($_GET["rendered"]);
-		
-	$haserror = false;
+	$title = filter_var(trim($_GET["title"], FILTER_SANITIZE_STRING));;
+	$rendered = filter_var(trim($_GET["rendered"], FILTER_SANITIZE_STRING));;
+
 	if ($title == "") {
 		$haserror = true;
-		$title_error = "A title is required.";
+		$error_message = trim("$error_message A title is required.");
+		$title_error = true;
 	}
 	if ($rendered == "") {
 		$haserror = true;
-		$rendered_error = "HTML is required.";
+		$error_message = trim("$error_message HTML is required.");
+		$rendered_error = true;
 	}
 }
 
 if ($action == "delete") {
 	/* first, NULL all ranking FKs for items that use this rank. */
 	$stmt = $smarty->dbh()->prepare("UPDATE {$opt["table_prefix"]}items SET ranking = NULL WHERE ranking = ?");
-	$stmt->bindValue(1, (int) $_GET["ranking"], PDO::PARAM_INT);
+	$stmt->bindValue(1, (int) $ranking, PDO::PARAM_INT);
 	$stmt->execute();
 
 	$stmt = $smarty->dbh()->prepare("DELETE FROM {$opt["table_prefix"]}ranks WHERE ranking = ?");
-	$stmt->bindValue(1, (int) $_GET["ranking"], PDO::PARAM_INT);
+	$stmt->bindValue(1, (int) $ranking, PDO::PARAM_INT);
 	$stmt->execute();
-	
+
 	header("Location: " . getFullPath("ranks.php?message=Rank+deleted."));
 	exit;
 }
 else if ($action == "promote") {
 	$stmt = $smarty->dbh()->prepare("UPDATE {$opt["table_prefix"]}ranks SET rankorder = rankorder + 1 WHERE rankorder = ? - 1");
-	$stmt->bindValue(1, (int) $_GET["rankorder"], PDO::PARAM_INT);
+	$stmt->bindValue(1, (int) $rankorder, PDO::PARAM_INT);
 	$stmt->execute();
 
 	$stmt = $smarty->dbh()->prepare("UPDATE {$opt["table_prefix"]}ranks SET rankorder = rankorder - 1 WHERE ranking = ?");
-	$stmt->bindValue(1, (int) $_GET["ranking"], PDO::PARAM_INT);
+	$stmt->bindValue(1, (int) $ranking, PDO::PARAM_INT);
 	$stmt->execute();
 
 	header("Location: " . getFullPath("ranks.php?message=Rank+promoted."));
@@ -79,19 +100,19 @@ else if ($action == "promote") {
 }
 else if ($action == "demote") {
 	$stmt = $smarty->dbh()->prepare("UPDATE {$opt["table_prefix"]}ranks SET rankorder = rankorder - 1 WHERE rankorder = ? + 1");
-	$stmt->bindValue(1, (int) $_GET["rankorder"], PDO::PARAM_INT);
+	$stmt->bindValue(1, (int) $rankorder, PDO::PARAM_INT);
 	$stmt->execute();
 
-    $stmt = $smarty->dbh()->prepare("UPDATE {$opt["table_prefix"]}ranks SET rankorder = rankorder + 1 WHERE ranking = ?");
-	$stmt->bindValue(1, (int) $_GET["ranking"], PDO::PARAM_INT);
+	$stmt = $smarty->dbh()->prepare("UPDATE {$opt["table_prefix"]}ranks SET rankorder = rankorder + 1 WHERE ranking = ?");
+	$stmt->bindValue(1, (int) $ranking, PDO::PARAM_INT);
 	$stmt->execute();
-    
+
 	header("Location: " . getFullPath("ranks.php?message=Rank+demoted."));
-    exit;
+	exit;
 }
 else if ($action == "edit") {
 	$stmt = $smarty->dbh()->prepare("SELECT title, rendered FROM {$opt["table_prefix"]}ranks WHERE ranking = ?");
-	$stmt->bindValue(1, (int) $_GET["ranking"], PDO::PARAM_INT);
+	$stmt->bindValue(1, (int) $ranking, PDO::PARAM_INT);
 	$stmt->execute();
 	if ($row = $stmt->fetch()) {
 		$title = $row["title"];
@@ -114,7 +135,7 @@ else if ($action == "insert") {
 			$stmt->bindParam(2, $rendered, PDO::PARAM_STR);
 			$stmt->bindParam(3, $rankorder, PDO::PARAM_INT);
 			$stmt->execute();
-			
+
 			header("Location: " . getFullPath("ranks.php?message=Rank+added."));
 			exit;
 		}
@@ -127,11 +148,11 @@ else if ($action == "update") {
 					"WHERE ranking = ?");
 		$stmt->bindParam(1, $title, PDO::PARAM_STR);
 		$stmt->bindParam(2, $rendered, PDO::PARAM_STR);
-		$stmt->bindValue(3, (int) $_GET["ranking"], PDO::PARAM_INT);
+		$stmt->bindValue(3, (int) $ranking, PDO::PARAM_INT);
 		$stmt->execute();
-		
+
 		header("Location: " . getFullPath("ranks.php?message=Rank+updated."));
-		exit;		
+		exit;
 	}
 }
 else {
@@ -160,7 +181,10 @@ $smarty->assign('rendered', $rendered);
 if (isset($rendered_error)) {
 	$smarty->assign('rendered_error', $rendered_error);
 }
-$smarty->assign('ranking', isset($_GET["ranking"]) ? (int) $_GET["ranking"] : "");
+$smarty->assign('ranking', isset($ranking) ? (int) $ranking : "");
 $smarty->assign('haserror', isset($haserror) ? $haserror : false);
+if ($error_message != "") {
+	$smarty->assign('error_message', $error_message);
+}
 $smarty->display('ranks.tpl');
 ?>

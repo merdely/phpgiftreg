@@ -17,8 +17,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>Test Gift Registry - Manage Events</title>
+	<title>{$opt.app_name} - Manage Events</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href="css/phpgiftreg.css" rel="stylesheet">
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1/font/bootstrap-icons.min.css" rel="stylesheet" crossorigin="anonymous">
 	<script src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" crossorigin="anonymous"></script>
@@ -27,155 +28,133 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1/dist/css/bootstrap-datepicker3.min.css" rel="stylesheet" crossorigin="anonymous">
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1/dist/js/bootstrap-datepicker.min.js" crossorigin="anonymous"></script>
 	<script src="js/themeswitcher.js"></script>
-	<script src="js/giftreg.js"></script>
-
-	<script language="JavaScript" type="text/javascript">
-		$(document).ready(function() {
-			$('#eventform').validate({
-				highlight: validate_highlight,
-				success: validate_success,
-				rules: {
-					description: {
-						required: true,
-						maxlength: 255
-					},
-					eventdate: {
-						required: true,
-						"date": true
-					}
-				},
-				messages: {
-					description: {
-						required: "A description of the event is required.",
-						maxlength: "The description must be 255 characters or less."
-					},
-					eventdate: {
-						required: "The event date is required.",
-						"date": "The event date must be a valid date in mm/dd/yyyy format."
-					}
-				}
-			});
-		});
-	</script>
 </head>
 <body>
 	{include file='navbar.tpl' isadmin=$isadmin}
-
-	<div class="container" style="padding-top: 60px;">
-	{if isset($message)}
-		<div class="row">
-			<div class="span12">
-    			<div class="alert alert-block">
+	<main>
+		<div class="container">
+			{if isset($message)}
+				<div class="alert alert-success" role="alert">
 					{$message|escape:'htmlall'}
 				</div>
-			</div>
-		</div>
-	{/if}
-	{if $opt.show_helptext}
-		<div class="row">
-			<div class="span12">
-				<div class="alert alert-info">
-					Here you can specify events <strong>of your own</strong>, like your birthday or your anniversary.  When the event occurs within {$opt.event_threshold} days, an event reminder will appear in the display of everyone who shops for you.
-					{if $isadmin}
-						<strong>System events</strong> are events which belong to no one -- like Christmas -- and will appear on everyone's display.
-					{/if}
-					Marking an item as <strong>Recurring yearly</strong> will cause them to show up year after year.
+			{/if}
+			{if isset($error_message)}
+				<div class="alert alert-danger" role="alert">
+					{$error_message|escape:'htmlall'}
 				</div>
-			</div>
-		</div>
-	{/if}
-	<div class="row">
-		<div class="span12">
-			<div class="well">
-				<h1>Events</h1>
-				<table class="table table-bordered table-striped">
-					<thead>
-						<tr>
-							<th>Event date</th>
-							<th>Description</th>
-							<th>Recurring?</th>
+			{/if}
+			{if $opt.show_helptext}
+				<div class="card text-bg-info mb-3">
+					<div class="card-header">Help</div>
+					<div class="card-body">
+							Here you can specify events <strong>of your own</strong>, like your birthday or your anniversary.  When the event occurs within {$opt.event_threshold} days, an event reminder will appear in the display of everyone who shops for you.
 							{if $isadmin}
-								<th>System event?</th>
+								<strong>System events</strong> are events which belong to no one -- like Christmas -- and will appear on everyone's display.
 							{/if}
-							<th>&nbsp;</th>
-						</tr>
-					</thead>
-					<tbody>
-						{foreach from=$events item=row}
-							<tr>
-								<td>{$row.eventdate}</td>
-								<td>{$row.description|escape:'htmlall'}</td>
-								<td>{if $row.recurring}Yes{else}No{/if}</td>
-								{if $isadmin}
-									<td>
-										{if $row.userid == ''}Yes{else}No{/if}
-									</td>
+							Marking an item as <strong>Recurring yearly</strong> will cause them to show up year after year.
+					</div>
+				</div>
+			{/if}
+			<div class="card mb-3">
+				<div class="card-header"><h1>Events</h1></div>
+				<div class="card-body">
+					<div class="table-responsive">
+						<table class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th>Event date</th>
+									<th>Description</th>
+									<th>Recurring?</th>
+									{if $isadmin}
+										<th>System event?</th>
+									{/if}
+									<th>&nbsp;</th>
+								</tr>
+							</thead>
+							<tbody>
+								{foreach from=$events item=row}
+									<tr>
+										<td>{$row.eventdate}</td>
+										<td>{$row.description|escape:'htmlall'}</td>
+										<td>{if $row.recurring}Yes{else}No{/if}</td>
+										{if $isadmin}
+											<td>
+												{if $row.userid == ''}Yes{else}No{/if}
+											</td>
+										{/if}
+										<td>
+											<a href="event.php?action=edit&eventid={$row.eventid}"><img alt="Edit Event" class="theme-image" data-light-src="images/pencil-light.png" data-dark-src="images/pencil-dark.png" src="images/pencil-light.png" border="0" title="Edit Event" /></a>&nbsp;<a href="event.php?action=delete&eventid={$row.eventid}"><img alt="Delete Event" class="theme-image" data-light-src="images/bin-light.png" data-dark-src="images/bin-dark.png" src="images/bin-light.png" border="0" title="Delete Event" /></a>
+										</td>
+									</tr>
+								{/foreach}
+							</tbody>
+						</table>
+					</div> <!-- table-responsive -->
+				</div> <!-- card-body -->
+			</div> <!-- card -->
+			<div class="row row-cols-1 row-cols-md-2 g4 d-flex d-flex justify-content-center">
+				<div class="col mb-3">
+					<div class="card h-100">
+						<form name="eventform" id="eventform" method="get" action="event.php" class="well form-horizontal">
+							<div class="card-header">Event Details</div>
+							<div class="card-body">
+								{if $action == "edit" || (isset($haserror) && $action == "update")}
+									<input type="hidden" name="eventid" value="{$eventid}">
+									<input type="hidden" name="action" value="update">
+								{elseif $action == "" || (isset($haserror) && $action == "insert")}
+									<input type="hidden" name="action" value="insert">
 								{/if}
-								<td>
-									<a href="event.php?action=edit&eventid={$row.eventid}"><img alt="Edit Event" src="images/pencil.png" border="0" title="Edit Event" /></a>&nbsp;<a href="event.php?action=delete&eventid={$row.eventid}"><img alt="Delete Event" src="images/bin.png" border="0" title="Delete Event" /></a>
-								</td>
-							</tr>
-						{/foreach}
-					</tbody>
-				</table>
-				<h5><a href="event.php">Add a new event</a></h5>
-			</div>
-		</div>
-	</div>
-	<div class="row">
-		<div class="span8 offset2">
-			<form name="eventform" id="eventform" method="get" action="event.php" class="well form-horizontal">
-				<fieldset>
-					<legend>Event Details</legend>
-					{if $action == "edit" || (isset($haserror) && $action == "update")}
-						<input type="hidden" name="eventid" value="{$eventid}">
-						<input type="hidden" name="action" value="update">
-					{elseif $action == "" || (isset($haserror) && $action == "insert")}
-						<input type="hidden" name="action" value="insert">
-					{/if}
-					<div class="control-group {if isset($description_error)}warning{/if}">
-						<label class="control-label" for="description">Description</label>
-						<div class="controls">
-							<input id="description" name="description" type="text" value="{$description|escape:'htmlall'}" class="input-xlarge " maxlength="255" placeholder="Description">
-							{if isset($description_error)}
-								<span class="help-inline">{$description_error}</span>
-							{/if}
-						</div>
-					</div>
-					<div class="control-group {if isset($eventdate_error)}warning{/if}">
-						<label class="control-label" for="eventdate">Event date</label>
-						<div class="controls">
-							<input id="eventdate" name="eventdate" type="text" value="{$eventdate|escape:'htmlall'}" class="input-xlarge" placeholder="mm/dd/yyyy" data-date-format="mm/dd/yyyy" data-provide="datepicker">
-							<p class="help-block">mm/dd/yyyy</p>
-							{if isset($eventdate_error)}
-								<span class="help-inline">{$eventdate_error}</span>
-							{/if}
-						</div>
-					</div>
-					<div class="control-group">
-						<label class="control-label" for="recurring">Recurring</label>
-						<div class="controls">
-							<input type="checkbox" name="recurring" {if $recurring}CHECKED{/if}>
-							Recurring yearly
-						</div>
-					</div>
-					{if $isadmin}
-						<div class="control-group">
-							<label class="control-label" for="systemevent">System event</label>
-							<div class="controls">
-								<input type="checkbox" name="systemevent" {if $systemevent}CHECKED{/if}>
-								System event
-							</div>
-						</div>
-					{/if}
-					<div class="form-actions">
-						<button type="submit" class="btn btn-primary">{if $action == "" || $action == "insert"}Add{else}Update{/if}</button>
-						<button type="button" class="btn" onClick="document.location.href='event.php';">Cancel</button>
-					</div>
-				</fieldset>
-			</form>
-		</div>
-	</div>
-</div>
+								<div class="row row-cols-2 g-3 mb-2 align-items-center">
+									<div class="col-4">
+										<label class="col-form-label" for="description">Description</label>
+									</div>
+									<div class="col">
+										<input id="description" name="description" type="text" value="{$description|escape:'htmlall'}" class="form-control{if isset($description_error)} is-invalid{/if}" maxlength="255" placeholder="Description" aria-describedby="description-helper" required>
+									</div>
+								</div>
+								<div class="row row-cols-2 g-3 mb-2 align-items-center">
+									<div class="col-4">
+										<label class="col-form-label" for="eventdate">Event date</label>
+									</div>
+									<div class="col">
+										<input id="eventdate" name="eventdate" type="text" value="{$eventdate|escape:'htmlall'}" class="form-control{if isset($eventdate_error)} is-invalid{/if}" placeholder="mm/dd/yyyy" data-date-format="mm/dd/yyyy" data-provide="datepicker" aria-describedby="eventdate-helper" required>
+									</div>
+								</div>
+								<div class="row row-cols-2 g-3 align-items-center">
+									<div class="col-4">
+										<label class="col-form-label" for="recurring">Recurring</label>
+									</div>
+									<div class="col">
+										<input type="checkbox" name="recurring" {if $recurring}CHECKED{/if}>
+										Recurring yearly
+									</div>
+									<div class="col">
+									</div>
+								</div>
+								{if $isadmin}
+									<div class="row row-cols-2 g-3 align-items-center">
+										<div class="col-4">
+											<label class="col-form-label" for="systemevent">System event</label>
+										</div>
+										<div class="col">
+											<input type="checkbox" name="systemevent" {if $systemevent}CHECKED{/if}>
+											System event
+										</div>
+										<div class="col">
+										</div>
+									</div> <!-- row -->
+								{/if}
+							</div> <!-- card-body -->
+							<div class="card-footer">
+								<button type="submit" class="btn btn-primary">{if $action == "" || $action == "insert"}Add{else}Update{/if}</button>
+								<button type="button" class="btn" onClick="document.location.href='event.php';">Cancel</button>
+							</div> <!-- card-footer -->
+						</form>
+					</div> <!-- card -->
+				</div> <!-- col -->
+			</div> <!-- row -->
+		</div> <!-- container -->
+	</main>
+	{include file='footer.tpl'}
 </body>
 </html>

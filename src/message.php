@@ -20,7 +20,7 @@ $opt = $smarty->opt();
 
 session_start();
 if (!isset($_SESSION["userid"])) {
-	header("Location: " . getFullPath("login.php"));
+	header("Location: " . getFullPath("login.php") . "?from=message.php");
 	exit;
 }
 else {
@@ -28,14 +28,27 @@ else {
 }
 
 $action = empty($_GET["action"]) ? "" : $_GET["action"];
+$failedcount = 0;
+$recipcount = 0;
 
 if ($action == "send") {
-	$msg = $_GET["msg"];
+	$msg = filter_var(trim($_GET["msg"], FILTER_SANITIZE_STRING));;
+	$msg = htmlspecialchars($msg, ENT_QUOTES, 'UTF-8');
 
-	for ($i = 0; $i < count($_GET["recipients"]); $i++)
-		sendMessage($userid, (int) $_GET["recipients"][$i], $msg, $smarty->dbh(), $smarty->opt());
-		
-	header("Location: " . getFullPath("index.php?message=Your+message+has+been+sent+to+" . count($_GET["recipients"]) . "+recipient(s)."));
+	for ($i = 0; $i < count($_GET['recipients']); $i++) {
+		$recipient = filter_var(trim($_GET["recipients"][$i]), FILTER_SANITIZE_NUMBER_INT);
+
+		if (filter_var($recipient, FILTER_SANITIZE_NUMBER_INT) !== false && $recipient != "" && is_numeric($recipient) && $recipient > 0) {
+			sendMessage($userid, (int) $recipient, $msg, $smarty->dbh(), $smarty->opt());
+			$recipcount++;
+		} else
+			$failedcount++;
+	}
+
+	if ($failedcount > 0)
+		header("Location: " . getFullPath("index.php?message=Your+message+has+been+sent+to+$recipcount+recipient(s).+There+were+$failedcount+failures."));
+	else
+		header("Location: " . getFullPath("index.php?message=Your+message+has+been+sent+to+$recipcount+recipient(s)."));
 	exit;
 }
 

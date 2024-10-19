@@ -21,13 +21,56 @@ $opt = $smarty->opt();
 
 session_start();
 if (!isset($_SESSION["userid"])) {
-	header("Location: " . getFullPath("login.php"));
+	header("Location: " . getFullPath("login.php") . "?from=help.php");
 	exit;
 }
 else {
 	$userid = $_SESSION["userid"];
 }
 
+$action = "";
+if (!empty($_POST["action"])) {
+	$action = $_POST["action"];
+
+	if ($action == "save") {
+		if (!empty($_POST["show_helptext"]))
+			$show_helptext = ($_POST["show_helptext"] == "on" ? 1 : 0);
+		else
+			$show_helptext = 0;
+
+		try {
+			$stmt = $smarty->dbh()->prepare("UPDATE {$opt["table_prefix"]}users SET show_helptext = ? WHERE userid = ?");
+			$stmt->bindParam(1, $show_helptext, PDO::PARAM_BOOL);
+			$stmt->bindParam(2, $userid, PDO::PARAM_INT);
+			$stmt->execute();
+		}
+		catch (PDOException $e) {
+			die("sql exception: " . $e->getMessage());
+		}
+	}
+	else {
+		die("Unknown verb.");
+	}
+}
+
+try {
+	$stmt = $smarty->dbh()->prepare("SELECT show_helptext FROM {$opt["table_prefix"]}users WHERE userid = ?");
+	$stmt->bindParam(1, $userid, PDO::PARAM_INT);
+
+	$stmt->execute();
+	if ($row = $stmt->fetch()) {
+		$smarty->assign('show_helptext', $row["show_helptext"]);
+		$_SESSION['show_helptext'] = $row["show_helptext"];
+	}
+	else {
+		die("You don't exist.");
+	}
+}
+catch (PDOException $e) {
+	die("sql exception: " . $e->getMessage());
+}
+
+$smarty->assign('myurl', "{$_SERVER['REQUEST_SCHEME']}://{$_SERVER['HTTP_HOST']}");
 $smarty->display('help.tpl');
 
 ?>

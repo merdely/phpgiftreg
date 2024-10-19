@@ -22,14 +22,14 @@ if (isset($_POST["action"]) && $_POST["action"] == "forgot") {
 	$username = $_POST["username"];
 
 	try {
-		// make sure that username is valid 
+		// make sure that username is valid
 		$stmt = $smarty->dbh()->prepare("SELECT email FROM {$opt["table_prefix"]}users WHERE username = ?");
 		$stmt->bindParam(1, $username, PDO::PARAM_STR);
-			
+
 		$stmt->execute();
 		if ($row = $stmt->fetch()) {
 			$email = $row["email"];
-		
+
 			if ($email == "")
 				$error = "The username '" . $username . "' does not have an e-mail address, so the password could not be sent.";
 			else {
@@ -42,7 +42,7 @@ if (isset($_POST["action"]) && $_POST["action"] == "forgot") {
 				mail(
 					$email,
 					"Gift Registry password reset",
-					"Your Gift Registry account information:\r\n" . 
+					"Your Gift Registry account information:\r\n" .
 						"Your username is '" . $username . "' and your new password is '$pwd'.",
 					"From: {$opt["email_from"]}\r\nReply-To: {$opt["email_reply_to"]}\r\nX-Mailer: {$opt["email_xmailer"]}\r\n"
 				) or die("Mail not accepted for $email");
@@ -64,6 +64,8 @@ if (isset($_POST["action"]) && $_POST["action"] == "forgot") {
 	}
 }
 else {
+	if (!isset($username)) $username = "";
+	$smarty->assign('username', $username);
 	$smarty->display('forgot.tpl');
 }
 ?>

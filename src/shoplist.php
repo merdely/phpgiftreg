@@ -20,7 +20,7 @@ $opt = $smarty->opt();
 
 session_start();
 if (!isset($_SESSION["userid"])) {
-	header("Location: " . getFullPath("login.php"));
+	header("Location: " . getFullPath("login.php") . "?from=shoplist.php");
 	exit;
 }
 else {
@@ -29,34 +29,44 @@ else {
 
 $opt['show_helptext'] = $_SESSION['show_helptext'];
 
-if (empty($_GET["sort"]))
-	$sort = "source";
-else
-	$sort = $_GET["sort"];
-	
-switch($sort) {
-	case "recipient":
-		$sortby = "fullname, source, price";
-		break;
-	case "description":
-		$sortby = "description, price";
-		break;
-	case "ranking":
-		$sortby = "rankorder DESC, source, price";
-		break;
-	case "source":
-		$sortby = "source, fullname, rankorder DESC";
-		break;
-	case "price":
-		$sortby = "a.quantity * i.price, fullname, source";
-		break;
-	default:
-		$sortby = "source, fullname, rankorder DESC";
+if (!empty($_GET["sortdir"])) {
+	$sortdir = strtoupper(trim($_GET["sortdir"])) == "DESC" ? "DESC" : "ASC";
+} else {
+	$sortdir = "ASC";
+}
+if (empty($_GET["sort"])) {
+	$sortby = "name $sortdir, price";
+	$sort = "name";
+} else {
+	$sort = filter_var(trim($_GET["sort"], FILTER_SANITIZE_STRING));;
+	$sort = htmlspecialchars($sort, ENT_QUOTES, 'UTF-8');
+	switch($sort) {
+		case "recipient":
+			$sortby = "fullname $sortdir, source, price";
+			$sort = "recipient";
+			break;
+		case "ranking":
+			$sortby = "rankorder $sortdir, source, price";
+			$sort = "ranking";
+			break;
+		case "source":
+			$sortby = "source $sortdir, fullname, rankorder DESC";
+			$sort = "source";
+			break;
+		case "price":
+			$sortby = "a.quantity * i.price $sortdir, fullname, source";
+			$sort = "price";
+			break;
+		default:
+			$sortby = "name $sortdir, price";
+			$sort = "name";
+			break;
+	}
 }
 
 try {
 	// not worried about sql injection here since $sortby is a function of $sort, which falls through.
-	$stmt = $smarty->dbh()->prepare("SELECT description, source, price, i.comment, a.quantity, a.quantity * i.price AS total, rendered, fullname " .
+	$stmt = $smarty->dbh()->prepare("SELECT name, source, price, r.title as ranktitle, i.comment, a.quantity, a.quantity * i.price AS total, rendered, fullname " .
 				"FROM {$opt["table_prefix"]}items i " .
 				"INNER JOIN {$opt["table_prefix"]}users u ON u.userid = i.userid " .
 				"INNER JOIN {$opt["table_prefix"]}ranks r ON r.ranking = i.ranking " .
@@ -80,6 +90,8 @@ try {
 		$shoplist[] = $row;
 	}
 
+	$smarty->assign('sort', $sort);
+	$smarty->assign('sortdir', $sortdir);
 	$smarty->assign('shoplist', $shoplist);
 	$smarty->assign('totalprice', formatPrice($totalprice, $opt));
 	$smarty->assign('itemcount', $itemcount);

@@ -72,10 +72,13 @@ function getGlobalOptions() {
 		"email_from" => "wishlist@erdelynet.com",
 
 		/* The e-mail Reply-To: header. */
-		"email_reply_to" => "mike@erdelynet.com",
+		"email_reply_to" => "wishlist@erdelynet.com",
 
 		/* The e-mail X-Mailer header. */
 		"email_xmailer" => "PHP/" . phpversion(),
+
+		/* Application name. */
+		"app_name" => "Test Gift Registry",
 
 		/* Whether or not to show brief blurbs in certain spots which describe how 
 			features work.
@@ -125,7 +128,39 @@ function getGlobalOptions() {
 			0 = don't hide it,
 			1 = hide it
 		*/
-		"hide_zero_price" => 1,
+		"hide_zero_price" => 0,
+
+		/* Default raking
+			This is the default rankings list:
+			5 = I'd love to get this
+			4 = I would really, really like this
+			3 = Would make me happy
+			2 = Would be nice to have
+			1 = Wouldn't mind it
+		*/
+		"default_ranking" => 3,
+
+		/* Default category
+			This is the default categories list:
+			1  = Miscellaneous
+			2  = Music
+			3  = Video Games
+			4  = Clothing
+			5  = Movies/DVD
+			6  = Gift Certificates
+			7  = Hobbies
+			8  = Household
+			9  = Electronics
+			10 = Ornaments/Figurines
+			11 = Automotive
+			12 = Toys
+			13 = Jewelry
+			14 = Computer
+			15 = Games
+			16 = Tools
+			17 = Books
+		*/
+		"default_category" => 1,
 
 		/* Whether or not to hash passwords.  Your version of MySQL may or may not
 			support it.

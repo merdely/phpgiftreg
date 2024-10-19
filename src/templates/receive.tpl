@@ -17,84 +17,61 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>Test Gift Registry - Receive an Item</title>
+	<title>{$opt.app_name} - Receive an Item</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href="css/phpgiftreg.css" rel="stylesheet">
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1/font/bootstrap-icons.min.css" rel="stylesheet" crossorigin="anonymous">
 	<script src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" crossorigin="anonymous"></script>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
 	<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1/dist/jquery.validate.min.js" crossorigin="anonymous"></script>
 	<script src="js/themeswitcher.js"></script>
-	<script src="js/giftreg.js"></script>
-	
-	<script language="JavaScript" type="text/javascript">
-		$(document).ready(function() {
-			$("#receiverform").validate({
-				highlight: validate_highlight,
-				success: validate_success,
-				rules: {
-					buyer: {
-						required: true
-					},
-					quantity: {
-						required: true,
-						digits: true,
-						min: 1,
-						max: {$quantity}
-					}
-				},
-				messages: {
-					buyer: {
-						required: "Please select a buyer."
-					},
-					quantity: {
-						required: "Please enter the quantity you received.",
-						digits: "Quantity must be a valid number.",
-						min: "Quantity must be 1 or greater.",
-						max: "Quantity must be {$quantity} or less."
-					}
-				}
-			});
-		});
-	</script>
 </head>
 <body>
 	{include file='navbar.tpl' isadmin=$isadmin}
-
-	<div class="container" style="padding-top: 60px;">
-		<div class="row">
-			<div class="span8 offset2">
-<form name="receiverform" id="receiverform" method="get" action="receive.php" class="well form-horizontal">
-	<input type="hidden" name="action" value="receive">
-	<input type="hidden" name="itemid" value="{$itemid}">
-	<fieldset>
-		<legend>Select the buyer and quantity</legend>
-		<div class="control-group">
-			<label class="control-label" for="buyer">Buyer</label>
-			<div class="controls">
-				<select id="buyer" name="buyer" class="input-xlarge">
-					<option value="">(select buyer)</option>
-					{foreach from=$buyers item=row}
-						<option value="{$row.userid}">{$row.fullname|escape:'htmlall'}</option>
-					{/foreach}
-				</select>
-			</div>
-		</div>
-		<div class="control-group">
-			<label class="control-label" for="quantity">Quantity received (maximum of {$quantity})</label>
-			<div class="controls">
-				<input type="text" id="quantity" name="quantity" value="1" maxlength="3">
-				<p class="help-block">Once you have received all of an item, it will be deleted.</p>
-			</div>
-		</div>
-		<div class="form-actions">
-			<button type="submit" class="btn btn-primary">Receive Item</button>
-			<button type="button" class="btn" onClick="document.location.href='index.php';">Cancel</button>
-		</div>
-	</fieldset>
-</form>
-			</div>
-		</div>
-	</div>
+	<main>
+		<div class="container">
+			<div class="row row-cols-1 row-cols-md-2 g4 d-flex d-flex justify-content-center">
+				<div class="col mb-3">
+					<div class="card h-100">
+						<form name="receiverform" id="receiverform" method="get" action="receive.php" class="well form-horizontal">
+							<div class="card-header"><h1>Mark Item Received</h1></div>
+							<div class="card-body">
+								<input type="hidden" name="action" value="receive">
+								<input type="hidden" name="itemid" value="{$itemid}">
+								<div class="row row-cols-2 g-3 mb-2 align-items-center">
+									<div class="col-4">
+										<label class="col-form-label" for="buyer">Buyer</label>
+									</div>
+									<div class="col">
+										<select id="buyer" name="buyer" class="form-select" required>
+											<option value="">(select buyer)</option>
+											{foreach from=$buyers item=row}
+												<option value="{$row.userid}">{$row.fullname|escape:'htmlall'}</option>
+											{/foreach}
+										</select>
+									</div>
+								</div>
+								<div class="row row-cols-2 g-3 align-items-center">
+									<div class="col-4">
+										<label class="col-form-label" for="quantity">Quantity received (maximum of {$quantity})</label>
+									</div>
+									<div class="col">
+										<input type="text" id="quantity" name="quantity" class="form-control" value="1" maxlength="3" aria-describedby="help-block" required>
+										<span id="help-block" class="form-text">Once you have received all of an item, it will be deleted.</span>
+									</div> <!-- col -->
+								</div> <!-- row -->
+							</div> <!-- card body -->
+							<div class="card-footer">
+								<button type="submit" class="btn btn-primary">Receive Item</button>
+								<button type="button" class="btn" onClick="document.location.href='index.php';">Cancel</button>
+							</div> <!-- card footer -->
+						</form>
+					</div> <!-- card -->
+				</div> <!-- col -->
+			</div> <!-- row -->
+		</div> <!-- container -->
+	</main>
+	{include file='footer.tpl'}
 </body>
 </html>

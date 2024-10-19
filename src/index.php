@@ -28,13 +28,17 @@ else {
 }
 
 if (!empty($_GET["message"])) {
-	$message = $_GET["message"];
+	$message = filter_var(trim($_GET["message"], FILTER_SANITIZE_STRING));;
+	$message = htmlspecialchars($message, ENT_QUOTES, 'UTF-8');
 }
 
 /* if we've got `page' on the query string, set the session page indicator. */
 if (isset($_GET["offset"])) {
-	$_SESSION["offset"] = $_GET["offset"];
-	$offset = $_GET["offset"];
+	$offset = filter_var(trim($_GET["offset"]), FILTER_SANITIZE_NUMBER_INT);
+	if (filter_var($offset, FILTER_SANITIZE_NUMBER_INT) === false || $offset == "" || !is_numeric($offset) || $offset < 0) {
+		die("Invalid page offset ({$_GET["offset"]})");
+	}
+	$_SESSION["offset"] = $offset;
 }
 else if (isset($_SESSION["offset"])) {
 	$offset = $_SESSION["offset"];
@@ -43,49 +47,81 @@ else {
 	$offset = 0;
 }
 
+if (isset($_GET["messageid"])) {
+	$messageid = filter_var(trim($_GET["messageid"]), FILTER_SANITIZE_NUMBER_INT);
+
+	if (filter_var($messageid, FILTER_SANITIZE_NUMBER_INT) === false || $messageid == "" || !is_numeric($messageid) || $messageid < 0) {
+		die("Invalid messageid ({$_GET["messageid"]})");
+	}
+}
+
+if (isset($_GET["shopper"])) {
+	$shopper = filter_var(trim($_GET["shopper"]), FILTER_SANITIZE_NUMBER_INT);
+
+	if (filter_var($shopper, FILTER_SANITIZE_NUMBER_INT) === false || $shopper == "" || !is_numeric($shopper) || $shopper < 0) {
+		die("Invalid shopper ({$_GET["shopper"]})");
+	}
+}
+
+if (isset($_GET["shopfor"])) {
+	$shopfor = filter_var(trim($_GET["shopfor"]), FILTER_SANITIZE_NUMBER_INT);
+
+	if (filter_var($shopfor, FILTER_SANITIZE_NUMBER_INT) === false || $shopfor == "" || !is_numeric($shopfor) || $shopfor < 0) {
+		die("Invalid shopfor ({$_GET["shopfor"]})");
+	}
+}
+
+if (isset($_GET["shoppee"])) {
+	$shoppee = filter_var(trim($_GET["shoppee"]), FILTER_SANITIZE_NUMBER_INT);
+
+	if (filter_var($shoppee, FILTER_SANITIZE_NUMBER_INT) === false || $shoppee == "" || !is_numeric($shoppee) || $shoppee < 0) {
+		die("Invalid shoppee ({$_GET["shoppee"]})");
+	}
+}
+
 if (!empty($_GET["action"])) {
 	$action = $_GET["action"];
 	if ($action == "ack") {
 		$stmt = $smarty->dbh()->prepare("UPDATE {$opt["table_prefix"]}messages SET isread = 1 WHERE messageid = ?");
-		$stmt->bindValue(1, (int) $_GET["messageid"], PDO::PARAM_INT);
+		$stmt->bindValue(1, (int) $messageid, PDO::PARAM_INT);
 		$stmt->execute();
 	}
 	else if ($action == "approve") {
 		$stmt = $smarty->dbh()->prepare("UPDATE {$opt["table_prefix"]}shoppers SET pending = 0 WHERE shopper = ? AND mayshopfor = ?");
-		$stmt->bindValue(1, (int) $_GET["shopper"], PDO::PARAM_INT);
+		$stmt->bindValue(1, (int) $shopper, PDO::PARAM_INT);
 		$stmt->bindParam(2, $userid, PDO::PARAM_INT);
 		$stmt->execute();
-		sendMessage($userid,(int) $_GET["shopper"],$_SESSION["fullname"] . " has approved your request to shop for him/her.", $smarty->dbh(), $smarty->opt());
+		sendMessage($userid,(int) $shopper,$_SESSION["fullname"] . " has approved your request to shop for him/her.", $smarty->dbh(), $smarty->opt());
 	}
 	else if ($action == "decline") {
-		$stmt = $smarty->dbh()->prepare("DELETE FROM {$opt["table_prefix"]}shoppers WHERE shopper = ? AND mayshopfor = ?"); 
-		$stmt->bindValue(1, (int) $_GET["shopper"], PDO::PARAM_INT);
+		$stmt = $smarty->dbh()->prepare("DELETE FROM {$opt["table_prefix"]}shoppers WHERE shopper = ? AND mayshopfor = ?");
+		$stmt->bindValue(1, (int) $shopper, PDO::PARAM_INT);
 		$stmt->bindParam(2, $userid, PDO::PARAM_INT);
 		$stmt->execute();
-		sendMessage($userid,(int) $_GET["shopper"],$_SESSION["fullname"] . " has declined your request to shop for him/her.", $smarty->dbh(), $smarty->opt());
+		sendMessage($userid,(int) $shopper,$_SESSION["fullname"] . " has declined your request to shop for him/her.", $smarty->dbh(), $smarty->opt());
 	}
 	else if ($action == "request") {
 		$stmt = $smarty->dbh()->prepare("INSERT INTO {$opt["table_prefix"]}shoppers(shopper,mayshopfor,pending) VALUES(?, ?, ?)");
 		$stmt->bindParam(1, $userid, PDO::PARAM_INT);
-		$stmt->bindValue(2, (int) $_GET["shopfor"], PDO::PARAM_INT);
+		$stmt->bindValue(2, (int) $shopfor, PDO::PARAM_INT);
 		$stmt->bindValue(3, $opt["shop_requires_approval"], PDO::PARAM_BOOL);
 		$stmt->execute();
 		if ($opt["shop_requires_approval"]) {
-			sendMessage($userid,(int) $_GET["shopfor"],$_SESSION["fullname"] . " has requested to shop for you.  Please approve or decline this request.", $smarty->dbh(), $smarty->opt());
+			sendMessage($userid,(int) $shopfor,$_SESSION["fullname"] . " has requested to shop for you.  Please approve or decline this request.", $smarty->dbh(), $smarty->opt());
 		}
 	}
 	else if ($action == "cancel") {
 		// this works for either cancelling a request or "unshopping" for a user.
 		$stmt = $smarty->dbh()->prepare("DELETE FROM {$opt["table_prefix"]}shoppers WHERE shopper = ? AND mayshopfor = ?");
 		$stmt->bindParam(1, $userid, PDO::PARAM_INT);
-		$stmt->bindValue(2, (int) $_GET["shopfor"], PDO::PARAM_INT);
+		$stmt->bindValue(2, (int) $shopfor, PDO::PARAM_INT);
 		$stmt->execute();
 	}
 	else if ($action == "subscribe") {
 		// ensure the current user can shop for that user first.
 		$stmt = $smarty->dbh()->prepare("SELECT pending FROM {$opt["table_prefix"]}shoppers WHERE shopper = ? AND mayshopfor = ?");
 		$stmt->bindParam(1, $userid, PDO::PARAM_INT);
-		$stmt->bindValue(2, (int) $_GET["shoppee"], PDO::PARAM_INT);
+		$stmt->bindValue(2, (int) $shoppee, PDO::PARAM_INT);
 		$stmt->execute();
 		if ($row = $stmt->fetch()) {
 			if ($row["pending"]) {
@@ -97,44 +133,61 @@ if (!empty($_GET["action"])) {
 		}
 
 		$stmt = $smarty->dbh()->prepare("INSERT INTO {$opt["table_prefix"]}subscriptions(publisher, subscriber) VALUES(?, ?)");
-		$stmt->bindValue(1, (int) $_GET["shoppee"], PDO::PARAM_INT);
+		$stmt->bindValue(1, (int) $shoppee, PDO::PARAM_INT);
 		$stmt->bindParam(2, $userid, PDO::PARAM_INT);
 		$stmt->execute();
 	}
 	else if ($action == "unsubscribe") {
 		$stmt = $smarty->dbh()->prepare("DELETE FROM {$opt["table_prefix"]}subscriptions WHERE publisher = ? AND subscriber = ?");
-		$stmt->bindValue(1, (int) $_GET["shoppee"], PDO::PARAM_INT);
+		$stmt->bindValue(1, (int) $shoppee, PDO::PARAM_INT);
 		$stmt->bindParam(2, $userid, PDO::PARAM_INT);
 		$stmt->execute();
 	}
 }
 
-if (!empty($_GET["mysort"]))
-	$_SESSION["mysort"] = $_GET["mysort"];
-	
+$reset_sortdir = false;
+if (!empty($_GET["mysort"])) {
+	$mysort = filter_var(trim($_GET["mysort"]), FILTER_SANITIZE_STRING);
+	$mysort = htmlspecialchars($mysort, ENT_QUOTES, 'UTF-8');
+	if (isset($_SESSION["mysort"]) && $_SESSION["mysort"] != $mysort) {
+		$reset_sortdir = true;
+	}
+	$_SESSION["mysort"] = $mysort;
+}
+
+if (!empty($_GET["sortdir"]) && !$reset_sortdir) {
+	$sortdir = strtoupper(trim($_GET["sortdir"])) == "DESC" ? "DESC" : "ASC";
+	$_SESSION["sortdir"] = $sortdir;
+}
+
+if (!isset($_SESSION["sortdir"]) || $reset_sortdir) {
+	$sortdir = "ASC";
+	$_SESSION["sortdir"] = $sortdir;
+}
+
 if (!isset($_SESSION["mysort"])) {
-	$sortby = "rankorder DESC, i.name";
+	$sortby = "rankorder {$_SESSION['sortdir']}, i.name";
 	$_SESSION["mysort"] = "ranking";
 }
 else {
 	switch ($_SESSION["mysort"]) {
-		case "ranking":
-			$sortby = "rankorder DESC, i.name";
-			break;
 		case "name":
-			$sortby = "i.name";
+			$sortby = "i.name {$_SESSION['sortdir']}";
+			break;
+		case "source":
+			$sortby = "source {$_SESSION['sortdir']}, rankorder, i.name";
 			break;
 		case "price":
-			$sortby = "price, rankorder DESC, i.name";
+			$sortby = "price {$_SESSION['sortdir']}, rankorder, i.name";
 			break;
 		case "category":
-			$sortby = "c.category, rankorder DESC, i.name";
+			$sortby = "c.category {$_SESSION['sortdir']}, rankorder, i.name";
 			break;
 		default:
-			$sortby = "rankorder DESC, i.name";
+			$sortby = "rankorder {$_SESSION['sortdir']}, i.name";
 	}
 }
-$stmt = $smarty->dbh()->prepare("SELECT itemid, name, description, c.category, price, url, rendered, comment, image_filename FROM {$opt["table_prefix"]}items i LEFT OUTER JOIN {$opt["table_prefix"]}categories c ON c.categoryid = i.category LEFT OUTER JOIN {$opt["table_prefix"]}ranks r ON r.ranking = i.ranking WHERE userid = ? ORDER BY " . $sortby);
+$stmt = $smarty->dbh()->prepare("SELECT itemid, name, description, i.category as catid, c.category, price, price as pricenum, source, url, i.ranking as rankid, rendered, comment, quantity, image_filename FROM {$opt["table_prefix"]}items i LEFT OUTER JOIN {$opt["table_prefix"]}categories c ON c.categoryid = i.category LEFT OUTER JOIN {$opt["table_prefix"]}ranks r ON r.ranking = i.ranking WHERE userid = ? ORDER BY " . $sortby);
 $stmt->bindParam(1, $userid, PDO::PARAM_INT);
 $stmt->execute();
 $myitems_count = 0;
@@ -145,11 +198,26 @@ for ($i = 0; $i < $offset; $i++, ++$myitems_count) {
 $i = 0;
 while ($i++ < $opt["items_per_page"] && $row = $stmt->fetch()) {
 	$row['price'] = formatPrice($row['price'], $opt);
+	$row['urlhost'] = preg_replace("/^(https?:\/\/)?(www\.)?([^\/]+)(\/.*)?$/", "$3", $row['url']);
 	$myitems[] = $row;
 	++$myitems_count;
 }
 while ($stmt->fetch()) {
 	++$myitems_count;
+}
+
+$stmt = $smarty->dbh()->prepare("SELECT categoryid, category FROM {$opt["table_prefix"]}categories ORDER BY category");
+$stmt->execute();
+$categories = array();
+while ($row = $stmt->fetch()) {
+	$categories[] = $row;
+}
+
+$stmt = $smarty->dbh()->prepare("SELECT ranking, title FROM {$opt["table_prefix"]}ranks ORDER BY rankorder");
+$stmt->execute();
+$ranks = array();
+while ($row = $stmt->fetch()) {
+	$ranks[] = $row;
 }
 
 $stmt = $smarty->dbh()->prepare("SELECT u.userid, u.fullname, u.comment, u.list_stamp, ISNULL(sub.subscriber) AS is_unsubscribed, COUNT(i.itemid) AS itemcount " .
@@ -196,7 +264,7 @@ $prospects = array();
 while ($row = $stmt->fetch()) {
 	$prospects[] = $row;
 }
-					
+
 $stmt = $smarty->dbh()->prepare("SELECT messageid, u.fullname, message, created " .
 			"FROM {$opt["table_prefix"]}messages m " .
 			"INNER JOIN {$opt["table_prefix"]}users u ON u.userid = m.sender " .
@@ -258,14 +326,14 @@ while ($row = $stmt->fetch()) {
 		$events[] = $thisevent;
 	}
 }
-					
+
 function compareEvents($a, $b) {
 	if ($a["daysleft"] == $b["daysleft"])
 		return 0;
 	else
 		return ($a["daysleft"] > $b["daysleft"]) ? 1 : -1;
 }
-					
+
 // i couldn't figure out another way to do this, so here goes.
 // sort() wanted to sort based on the array keys, which were 0..n - 1, so that was useless.
 usort($events, "compareEvents");
@@ -290,7 +358,7 @@ if (($_SESSION["admin"] == 1) && $opt["newuser_requires_approval"]) {
 	$query = "SELECT userid, fullname, email, approved, initialfamilyid, familyname " .
 				"FROM {$opt["table_prefix"]}users u " .
 				"LEFT OUTER JOIN {$opt["table_prefix"]}families f ON f.familyid = u.initialfamilyid " .
-				"WHERE approved = 0 " . 
+				"WHERE approved = 0 " .
 				"ORDER BY fullname";
 	$stmt = $smarty->dbh()->prepare($query);
 	$stmt->execute();
@@ -304,6 +372,10 @@ $smarty->assign('fullname', $_SESSION['fullname']);
 if (isset($message)) {
 	$smarty->assign('message', $message);
 }
+$smarty->assign('mysort', $_SESSION['mysort']);
+$smarty->assign('sortdir', $_SESSION['sortdir']);
+$smarty->assign('categories', $categories);
+$smarty->assign('ranks', $ranks);
 $smarty->assign('myitems', $myitems);
 $smarty->assign('myitems_count', $myitems_count);
 $smarty->assign('offset', $offset);

@@ -20,7 +20,7 @@ $opt = $smarty->opt();
 
 session_start();
 if (!isset($_SESSION["userid"])) {
-	header("Location: " . getFullPath("login.php"));
+	header("Location: " . getFullPath("login.php") . "?from=event.php");
 	exit;
 }
 else {
@@ -28,12 +28,20 @@ else {
 }
 
 if (!empty($_GET["message"])) {
-    $message = $_GET["message"];
+	$message = filter_var(trim($_GET["message"], FILTER_SANITIZE_STRING));;
+	$message = htmlspecialchars($message, ENT_QUOTES, 'UTF-8');
 }
 
 if (isset($_GET["eventid"])) {
-	$eventid = $_GET["eventid"];
+	$eventid = filter_var(trim($_GET["eventid"]), FILTER_SANITIZE_NUMBER_INT);
+
+	if (filter_var($eventid, FILTER_SANITIZE_NUMBER_INT) === false || $eventid == "" || !is_numeric($eventid) || $eventid < 0) {
+		die("Invalid eventid ({$_GET["eventid"]})");
+	}
 }
+
+$haserror = false;
+$error_message = "";
 
 // for security, let's make sure that if an eventid was passed in, it belongs
 // to $userid (or is a system event and the user is an admin).
@@ -62,7 +70,8 @@ $action = isset($_GET["action"]) ? $_GET["action"] : "";
 
 if ($action == "insert" || $action == "update") {
 	/* validate the data. */
-	$description = trim($_GET["description"]);
+	$description = filter_var(trim($_GET["description"], FILTER_SANITIZE_STRING));;
+	$description = htmlspecialchars($description, ENT_QUOTES, 'UTF-8');
 	try {
 		$eventdate = new DateTime($_GET["eventdate"]);
 	}
@@ -71,15 +80,16 @@ if ($action == "insert" || $action == "update") {
 	}
 	$recurring = (strtoupper($_GET["recurring"]) == "ON" ? 1 : 0);
 	$systemevent = (strtoupper($_GET["systemevent"]) == "ON" ? 1 : 0);
-		
-	$haserror = false;
+
 	if ($description == "") {
 		$haserror = true;
-		$description_error = "A description is required.";
+		$error_message = trim("$error_message A description is required.");
+		$description_error = true;
 	}
 	if ($eventdate == FALSE) {
 		$haserror = true;
-		$eventdate_error = "Date is out of range for this server.";
+		$error_message = trim("$error_message Date is out of range for this server.");
+		$eventdate_error = true;
 	}
 }
 
@@ -101,7 +111,7 @@ else if ($action == "edit") {
 	try {
 		$stmt = $smarty->dbh()->prepare("SELECT description, eventdate, recurring, userid FROM {$opt["table_prefix"]}events WHERE eventid = ?");
 		$stmt->bindParam(1, $eventid, PDO::PARAM_INT);
-		
+
 		$stmt->execute();
 
 		// we know this will work, see above.
@@ -131,7 +141,7 @@ else if ($action == "insert") {
 			$stmt->bindParam(4, $recurring, PDO::PARAM_BOOL);
 
 			$stmt->execute();
-		
+
 			header("Location: " . getFullPath("event.php?message=Event+added."));
 			exit;
 		}
@@ -147,7 +157,7 @@ else if ($action == "update") {
 				"userid = ?, " .
 				"description = ?, " .
 				"eventdate = ?, " .
-				"recurring = ? " . 
+				"recurring = ? " .
 				"WHERE eventid = ?");
 			$stmt->bindValue(1, $systemevent ? NULL : $userid, PDO::PARAM_BOOL);
 			$stmt->bindParam(2, $description, PDO::PARAM_STR);
@@ -198,6 +208,9 @@ try {
 	}
 	$smarty->assign('action', $action);
 	$smarty->assign('haserror', isset($haserror) ? $haserror : false);
+	if ($error_message != "") {
+		$smarty->assign('error_message', $error_message);
+	}
 	$smarty->assign('events', $events);
 	$smarty->assign('eventdate', $eventdate->format($opt["date_format"]));
 	if (isset($eventdate_error)) {

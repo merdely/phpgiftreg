@@ -18,15 +18,25 @@ require_once(dirname(__FILE__) . "/includes/MySmarty.class.php");
 $smarty = new MySmarty();
 $opt = $smarty->opt();
 
+$pages = [ "admin.php", "categories.php", "event.php", "families.php", "forgot.php", "help.php", "index.php", "item.php", "login.php", "message.php", "mylist.php", "profile.php", "ranks.php", "receive.php", "shoplist.php", "shop.php", "signup.php", "users.php", ];
+
 if (isset($_GET["action"])) {
 	if ($_GET["action"] == "logout") {
 		session_start();
 		session_destroy();
+		$smarty->assign('reset_theme', 'true');
 	}
 }
 
+if (isset($_GET["from"])) {
+	$from = filter_var(trim($_GET["from"], FILTER_SANITIZE_STRING));;
+	$from = htmlspecialchars($from, ENT_QUOTES, 'UTF-8');
+} else
+    $from = "";
+
 if (!empty($_POST["username"])) {
-	$username = $_POST["username"];
+	$username = filter_var(strtolower(trim($_REQUEST["username"])), FILTER_SANITIZE_STRING);
+	$username = htmlspecialchars($username, ENT_QUOTES, 'UTF-8');
 	$password = $_POST["password"];
 
 	try {
@@ -42,8 +52,11 @@ if (!empty($_POST["username"])) {
 			$_SESSION["admin"] = $row["admin"];
 			$_SESSION["show_helptext"] = $row["show_helptext"];
 			$opt['show_helptext'] = $row["show_helptext"];
-		
-			header("Location: " . getFullPath("index.php"));
+
+			if (in_array($from, $pages))
+				header("Location: " . getFullPath($from));
+			else
+				header("Location: " . getFullPath("index.php"));
 			exit;
 		}
 	}
@@ -51,10 +64,12 @@ if (!empty($_POST["username"])) {
 		die("sql exception: " . $e->getMessage());
 	}
 
+	$smarty->assign('from', $from);
 	$smarty->assign('username', $username);
 	$smarty->display('login.tpl');
 }
 else {
+	$smarty->assign('from', $from);
 	$smarty->display('login.tpl');
 }
 ?>
