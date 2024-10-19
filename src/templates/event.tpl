@@ -156,5 +156,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 		</div> <!-- container -->
 	</main>
 	{include file='footer.tpl'}
+	{if isset($action) && $action == "edit"} <script> $(document).ready(function() { $('html, body').animate({ scrollTop: $(document).height() }, 'fast'); }); </script> {/if}
 </body>
 </html>

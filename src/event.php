@@ -71,7 +71,6 @@ $action = isset($_GET["action"]) ? $_GET["action"] : "";
 if ($action == "insert" || $action == "update") {
 	/* validate the data. */
 	$description = filter_var(trim($_GET["description"], FILTER_SANITIZE_STRING));;
-	$description = htmlspecialchars($description, ENT_QUOTES, 'UTF-8');
 	try {
 		$eventdate = new DateTime($_GET["eventdate"]);
 	}
