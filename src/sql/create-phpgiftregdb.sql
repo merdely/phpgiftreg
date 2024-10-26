@@ -89,7 +89,7 @@ CREATE TABLE `messages` (
   `messageid` int(11) NOT NULL auto_increment,
   `sender` int(11) NOT NULL default '0',
   `recipient` int(11) NOT NULL default '0',
-  `message` varchar(255) NOT NULL default '',
+  `message` varchar(4096) NOT NULL default '',
   `isread` tinyint(1) NOT NULL default '0',
   `created` date NOT NULL default '2000-01-01',
   PRIMARY KEY  (`messageid`)
