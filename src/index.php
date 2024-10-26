@@ -177,6 +177,9 @@ else {
 		case "source":
 			$sortby = "source {$_SESSION['sortdir']}, rankorder, i.name";
 			break;
+		case "quantity":
+			$sortby = "quantity {$_SESSION['sortdir']}, rankorder, i.name";
+			break;
 		case "price":
 			$sortby = "price {$_SESSION['sortdir']}, rankorder, i.name";
 			break;

@@ -172,6 +172,10 @@ else {
 			$sortby = "source $sortdir, rankorder, name";
 			$sort = "source";
 			break;
+		case "quantity":
+			$sortby = "quantity $sortdir, rankorder, name";
+			$sort = "quantity";
+			break;
 		case "price":
 			$sortby = "price $sortdir, rankorder, name";
 			$sort = "price";
